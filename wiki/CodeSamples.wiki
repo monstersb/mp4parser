@@ -1,9 +1,5 @@
 #summary This page provides some code samples to get you started
 
-== Introduction ==
-
-This page provides some code samples to get you started.
-
 == Opening a file ==
 
 {{{

@@ -1,4 +1,5 @@
 #summary This page provides some code samples to get you started
+#labels Featured
 
 == Opening a file ==
 

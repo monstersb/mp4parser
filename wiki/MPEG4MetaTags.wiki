@@ -11,3 +11,4 @@ There is indication that ID3v2 will be added ([http://www.mp4ra.org/specs.html#i
   * http://atomicparsley.sourceforge.net/mpeg-4files.html
   * http://www.mp4ra.org/specs.html#id3v2
   * http://code.google.com/p/php-reader/wiki/ISO14496
+  * http://code.google.com/p/mp4v2/wiki/iTunesMetadata

@@ -4,123 +4,67 @@
 == Opening a file ==
 
 {{{
-FileRandomAccessDataSource dataSource = null;
-try {
-  dataSource = new FileRandomAccessDataSource(file);
-  IsoFile isoFile = new IsoFile(dataSource);
-
-  isoFile.parse();
-  isoFile.parseMdats();
-  List<?> boxContainers = Arrays.asList(isoFile.getBoxes());
-
-  // info: add code to read data from boxes here
-
-} 
-catch ( IOException ex ) {
-  ex.printStackTrace();
-}
-finally {
-  try {
-    if ( dataSource != null ) {
-      dataSource.close();
-    }
-  } 
-  catch ( IOException ex ) {
-     // info: ignore
-  }
-}
+    public static void main(String[] args) throws IOException {
+        IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapper(new File(args[0]));
+        IsoFile isoFile = new IsoFile(isoBufferWrapper);
+        isoFile.parse();
 }}}
 
 == Getting a Specific Box ==
 
-This example shows how you can use an XPath style approach to get a Box
+This example shows how you can use an XPath style approach to get and replace a Box and to write the changed MP4 to an OutputStream.
 
 {{{
+public static void main(String[] args) throws IOException {
+        IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapper(new File(args[0]));
+        IsoFile isoFile = new IsoFile(isoBufferWrapper);
+        isoFile.parse();
+        AppleItemListBox appleItemListBox =
+                (AppleItemListBox) IsoFileConvenienceHelper.get(isoFile, "moov/udta/meta/ilst");
+        AppleAlbumBox appleAlbumBox =
+                (AppleAlbumBox) IsoFileConvenienceHelper.get(appleItemListBox, "\u00a9alb");
+        if (appleAlbumBox != null) {
+            appleItemListBox.removeBox(appleAlbumBox);
+        }
 
-static void readFile(File file) throws IOException {
+        AppleAlbumBox albumBox = new AppleAlbumBox();
+        albumBox.setValue("my album");
+        appleItemListBox.addBox(albumBox);
+        System.err.println(isoFile);
 
-  FileRandomAccessDataSource dataSource = new FileRandomAccessDataSource(file);
-  IsoFile isoFile = new IsoFile(dataSource);
-
-  isoFile.parse();
-  isoFile.parseMdats();
-  List<?> boxContainers = Arrays.asList(isoFile.getBoxes());
-
-  Box box =  (Box) get(isoFile, "/moov/udta/meta/ilst/©nam");
-  if ( box instanceof AppleTrackTitleBox ) {
-    AppleTrackTitleBox titleBox = (AppleTrackTitleBox) box;
-    System.out.println("Track title: "  + titleBox.getTrackTitle());
-  }
-}
-
-Object get(IsoFile isoFile, String path) {
-
-  String[] parts = path.split("/");
-  if (parts.length == 0) {
-	return null;
-  }
-
-  List<String> partList = new ArrayList<String>(Arrays.asList(parts));
-
-  if ("".equals(partList.get(0))) {
-	partList.remove(0);
-  }
-
-  if (partList.size() > 0) {
-	List<Box> boxes = Arrays.asList(isoFile.getBoxes()) ;
-	
-	return get(boxes, partList);
-  }
-  return null;
-}
-
-Object get(List<?> boxes, List<String> path) {
-
-  Object get(List<?> boxes, List<String> path) {
-  
-  String typeInPath = path.remove(0);
-  
-  System.out.print("/" + typeInPath);
-  
-  for (Object object : boxes) {
-    if (object instanceof BoxContainer) {
-    BoxContainer boxContainer = (BoxContainer) object;
-    String type = "";
-    try {
-      type = new String(boxContainer.getType(), "ISO-8859-1");
-    } catch (UnsupportedEncodingException e) {
-      type = new String(boxContainer.getType()) ;
+        isoFile.getBox(new IsoOutputStream(new ByteArrayOutputStream()));
     }
-    
-    if (typeInPath.equals(type)) {  
-      List<Box> children = Arrays.asList(boxContainer.getBoxes());
-      if ( path.size() > 0 ) {
-      if ( children.size() > 0 ) {
-        return get(children, path);
-      }
-      }
-      else {
-      return object;
-      }
+}}}
+
+== Only parse boxes you are interested in ==
+
+{{{
+  public static void main(String[] args) throws IOException {
+        IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapper(new File(args[0]));
+        Properties properties = new Properties();
+
+        properties.setProperty("ilst-\u00A9alb", "com.coremedia.iso.boxes.apple.AppleAlbumBox()");
+        properties.setProperty("moov", "com.coremedia.iso.boxes.MovieBox()");
+        properties.setProperty("meta", "com.coremedia.iso.boxes.MetaBox()");
+        properties.setProperty("udta", "com.coremedia.iso.boxes.UserDataBox()");
+        properties.setProperty("meta-ilst", "com.coremedia.iso.boxes.apple.AppleItemListBox()");
+        properties.setProperty("default", "com.coremedia.iso.boxes.UnknownBox(type)");
+        PropertyBoxParserImpl boxParser = new PropertyBoxParserImpl(properties);
+        IsoFile isoFile = new IsoFile(isoBufferWrapper, boxParser);
+        isoFile.parse();
+        AppleItemListBox appleItemListBox =
+                (AppleItemListBox) IsoFileConvenienceHelper.get(isoFile, "moov/udta/meta/ilst");
+        AppleAlbumBox appleAlbumBox =
+                (AppleAlbumBox) IsoFileConvenienceHelper.get(appleItemListBox, "\u00a9alb");
+        if (appleAlbumBox != null) {
+            appleItemListBox.removeBox(appleAlbumBox);
+        }
+        AppleAlbumBox albumBox = new AppleAlbumBox();
+        albumBox.setValue("my album");
+        appleItemListBox.addBox(albumBox);
+        System.err.println(isoFile);
+
+        isoFile.getBox(new IsoOutputStream(new ByteArrayOutputStream()));
     }
-  
-    } else if (object instanceof Box) {
-    Box box = (Box) object;
-    String type = "";
-    try {
-      type = new String(box.getType(), "ISO-8859-1");
-    } catch (UnsupportedEncodingException e) {
-      type = new String(box.getType());
-    }
-    if ( path.size() == 0  && typeInPath.equals(type)) { 
-      return object;
-    }
-   
-    }
-  
-  }
-  
-  return null;
-  }
 }
 }}}

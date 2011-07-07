@@ -1,6 +1,8 @@
 #summary This page provides some code samples to get you started
 #labels Featured
 
+If you are working on anything later than beta-3 you have to use IsoBufferWrapperImpl instead of IsoBufferWrapper. 
+
 == Opening a file ==
 
 {{{

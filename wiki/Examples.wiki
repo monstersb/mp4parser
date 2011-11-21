@@ -1,4 +1,14 @@
+=ISO Parser Quickstart=
 
+The isoparser can read and write the MP4 file structure. It is a low level tool dealing with the so called boxes. 
+
+Let's quickly start with some example
+{{{
+IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapperImpl(new File(mp4));
+IsoFile isoFile = new IsoFile(isoBufferWrapper);
+isoFile.parse();
+List<Box> boxes = isoFile.getBoxes();
+}}}
 {{{
 IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapperImpl(new File(mp4));
 IsoFile isoFile = new IsoFile(isoBufferWrapper);

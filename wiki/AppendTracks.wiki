@@ -2,27 +2,28 @@
 
 == The most simple way - same encoder settings ==
 {{{
-        Movie video = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(AppendExample.class.getResourceAsStream("/count-video.mp4"))));
-        Movie audio = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(AppendExample.class.getResourceAsStream("/count-english-audio.mp4"))));
-
-        List<Track> videoTracks = video.getTracks();
-        video.setTracks(new LinkedList<Track>());
-
-        List<Track> audioTracks = audio.getTracks();
+MovieCreator mc = new MovieCreator();
+Movie video = mc.build(Channels.newChannel(AppendExample.class.getResourceAsStream("/count-video.mp4")));
+Movie audio = mc.build(Channels.newChannel(AppendExample.class.getResourceAsStream("/count-english-audio.mp4")));
 
 
-        for (Track videoTrack : videoTracks) {
-            video.addTrack(new AppendTrack(videoTrack, videoTrack));
-        }
-        for (Track audioTrack : audioTracks) {
-            video.addTrack(new AppendTrack(audioTrack, audioTrack));
-        }
+List<Track> videoTracks = video.getTracks();
+video.setTracks(new LinkedList<Track>());
 
-        IsoFile out = new DefaultMp4Builder().build(video);
-        FileOutputStream fos = new FileOutputStream(new File(String.format("output.mp4")));
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        out.getBox(new IsoOutputStream(bos));
-        bos.close();
+List<Track> audioTracks = audio.getTracks();
+
+
+for (Track videoTrack : videoTracks) {
+   video.addTrack(new AppendTrack(videoTrack, videoTrack));
+}
+for (Track audioTrack : audioTracks) {
+   video.addTrack(new AppendTrack(audioTrack, audioTrack));
+}
+
+IsoFile out = new DefaultMp4Builder().build(video);
+FileOutputStream fos = new FileOutputStream(new File(String.format("output.mp4")));
+out.getBox(fos.getChannel());
+fos.close();
 }}} 
 
 The AppendTrack initialization will fail if the Sample Description Boxes of the track arguments differ. 

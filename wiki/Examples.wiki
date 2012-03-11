@@ -4,15 +4,13 @@ The isoparser can read and write the MP4 file structure. It is a low level tool 
 
 Let's quickly start with some example
 {{{
-IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapperImpl(new File(mp4));
-IsoFile isoFile = new IsoFile(isoBufferWrapper);
-isoFile.parse();
+FileChannel fc = new FileInputStream("file.mp4").getChannel();
+IsoFile isoFile = new IsoFile(fc);
 List<Box> boxes = isoFile.getBoxes();
 }}}
 {{{
-IsoBufferWrapper isoBufferWrapper = new IsoBufferWrapperImpl(new File(mp4));
-IsoFile isoFile = new IsoFile(isoBufferWrapper);
-isoFile.parse();
+FileChannel fc = new FileInputStream("file.mp4").getChannel();
+IsoFile isoFile = new IsoFile(fc);
 MovieBox moov = isoFile.getBoxes(MovieBox.class).get(0);
 }}}
 gives you the Movie Box. 
@@ -35,22 +33,23 @@ In the last weeks I added an API that handles MP4 files on a much higher level. 
 The example can be found in SVN under examples/src/main/java/com/googlecode/mp4parser/MuxExample.java
 
 {{{
-Movie countVideo = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(MuxExample.class.getResourceAsStream("/count-video.mp4"))));
-Movie countAudioDeutsch = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(MuxExample.class.getResourceAsStream("/count-deutsch-audio.mp4"))));
-Movie countAudioEnglish = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(MuxExample.class.getResourceAsStream("/count-english-audio.mp4"))));
+        Movie countVideo = new MovieCreator().build(Channels.newChannel(MuxExample.class.getResourceAsStream("/count-video.mp4")));
+        Movie countAudioDeutsch = new MovieCreator().build(Channels.newChannel(MuxExample.class.getResourceAsStream("/count-deutsch-audio.mp4")));
+        Movie countAudioEnglish = new MovieCreator().build(Channels.newChannel(MuxExample.class.getResourceAsStream("/count-english-audio.mp4")));
 
-Track audioTrackDeutsch = countAudioDeutsch.getTracks().get(0);
-audioTrackDeutsch.getTrackMetaData().setLanguage("deu");
-Track audioTrackEnglish = countAudioEnglish.getTracks().get(0);
-audioTrackEnglish.getTrackMetaData().setLanguage("eng");
+        Track audioTrackDeutsch = countAudioDeutsch.getTracks().get(0);
+        audioTrackDeutsch.getTrackMetaData().setLanguage("deu");
+        Track audioTrackEnglish = countAudioEnglish.getTracks().get(0);
+        audioTrackEnglish.getTrackMetaData().setLanguage("eng");
 
-countVideo.addTrack(audioTrackDeutsch);
-countVideo.addTrack(audioTrackEnglish);
+        countVideo.addTrack(audioTrackDeutsch);
+        countVideo.addTrack(audioTrackEnglish);
 
-IsoFile out = new DefaultMp4Builder().build(countVideo);
-FileOutputStream fos = new FileOutputStream(new File("output.mp4"));
-out.getBox(new IsoOutputStream(fos));
-fos.close();
+
+        IsoFile out = new DefaultMp4Builder().build(countVideo);
+        FileOutputStream fos = new FileOutputStream(new File("output.mp4"));
+        out.getBox(fos.getChannel());
+        fos.close();
 }}}
 
 This snippet open 3 MP4 files, adds the tracks of the latter two to the first and writes the result into a file. 

@@ -32,6 +32,8 @@ The AppendTrack initialization will fail if the Sample Description Boxes of the 
 
 Another way to append two videos is to keep the media in separate tracks. All tracks will have different start times (via edit list box)  timed in a way that track 'B' start it the moment track 'A' ends. 
 
+This will only work with quicktime since edit list boxes are not well supported in typical players.
+
 == Different encoder settings - special case H264 (not implemented) == 
 
 the avcC Box contains to important decoder configurations: 

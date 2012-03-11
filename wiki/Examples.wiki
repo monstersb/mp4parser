@@ -58,7 +58,7 @@ This snippet open 3 MP4 files, adds the tracks of the latter two to the first an
 The example can be found in SVN under examples/src/main/java/com/googlecode/mp4parser/SubTitleExample.java
 
 {{{
-        Movie countVideo = new MovieCreator().build(new IsoBufferWrapperImpl(readFully(SubTitleExample.class.getResourceAsStream("/count-video.mp4"))));
+Movie countVideo = new MovieCreator().build(Channels.newChannel(SubTitleExample.class.getResourceAsStream("/count-video.mp4")));
 
 TextTrackImpl subTitleEng = new TextTrackImpl();
 subTitleEng.getTrackMetaData().setLanguage("eng");

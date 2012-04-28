@@ -24,7 +24,7 @@ This creates the first pass log file.
 ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 1 -b 600k -s 448x188 not_used.mp4
 }}}
 
-These commands use that log file. 
+These commands use that log file (and create H263 with my ffmpeg - booooaaahhhh I hate encoding). 
 {{{
 ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 230k -s 224x92 big_buck_bunny_230k.mp4 
 ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 331k -s 288x120 big_buck_bunny_331k.mp4 

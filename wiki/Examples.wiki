@@ -86,4 +86,3 @@ fos.close();
 === More Examples === 
 
  * [AppendTracks Append Tracks]
- * [ParsingSpecificBoxes Parsing just some boxes]

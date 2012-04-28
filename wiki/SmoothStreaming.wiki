@@ -47,6 +47,16 @@ for audio I only use one quality. The player and the fragmenter tool allow more 
 
 = Fragmenting the content = 
 
+Download the smooth-streaming-fragmenter from the [http://code.google.com/p/mp4parser/downloads/list download area]. 
+
+start the fragmentation with: 
+{{{
+java -jar smooth-streaming-fragmenter-[version].jar big_buck_bunny*.mp4
+}}}
+
+the result will be in the fragments directory.
+
+
 = Streaming from google code's SVN =
 
 Add your content here.  Format your content with:

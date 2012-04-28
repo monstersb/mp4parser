@@ -1,0 +1,48 @@
+#summary How to Smooth Stream from Apache without any plugin
+
+= Introduction =
+
+The default deployment for MS Smooth Streaming requires an IIS. With some tricks we can use a default Apache without any configuration hassle.
+
+
+= Preparing the content =
+
+Let's start with content that is publicy available. Download the good old [http://www.bigbuckbunny.org/index.php/download/ Big Buck Bunny]. 
+
+I use the version big_buck_bunny_720p_surround.avi in my example (and I took most of the example from the [http://smoothstreaming.code-shop.com/trac/wiki/Smooth-Streaming-Encoding-FFmpeg Codeshop] guys).
+
+
+
+==Creating the qualities== 
+
+video:
+
+{{{
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 1 -b 230k -s 224x92 big_buck_bunny_230k.mp4
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 230k -s 224x92 big_buck_bunny_230k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 331k -s 288x120 big_buck_bunny_331k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 477k -s 368x152 big_buck_bunny_477k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 688k -s 448x188 big_buck_bunny_688k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 991k -s 592x248 big_buck_bunny_991k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 1427k -s 768x320  big_buck_bunny_1427k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 2056k -s 992x412  big_buck_bunny_2056k.mp4 
+ffmpeg -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 2962k -s 1280x536  big_buck_bunny_2962k.mp4
+}}}
+
+audio:
+
+{{{
+ffmpeg -i big_buck_bunny_720p_surround.avi -vn -acodec aac -ac 2  -strict experimental  big_buck_bunny_audio_2.mp4
+}}}
+
+for audio I only use one quality. The player and the fragmenter tool allow more than one audio quality. 
+
+
+= Fragmenting the content = 
+
+= Streaming from google code's SVN =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages

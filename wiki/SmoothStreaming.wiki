@@ -21,19 +21,16 @@ This probably not the best way to encode the video but I'm a container guy - not
 
 This creates the first pass log file. 
 {{{
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 1 -b 600k -s 448x188 not_used.mp4
+x264 -p 1 -B 400 big_buck_bunny_720p_surround.avi statsfile
 }}}
 
 These commands use that log file (and create H263 with my ffmpeg - booooaaahhhh I hate encoding). 
 {{{
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 230k -s 224x92 big_buck_bunny_230k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 331k -s 288x120 big_buck_bunny_331k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 477k -s 368x152 big_buck_bunny_477k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 688k -s 448x188 big_buck_bunny_688k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 991k -s 592x248 big_buck_bunny_991k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 1427k -s 768x320  big_buck_bunny_1427k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 2056k -s 992x412  big_buck_bunny_2056k.mp4 
-ffmpeg -y -i big_buck_bunny_720p_surround.avi -an -g 100 -keyint_min 50 -flags2 -mbtree  -pass 2 -b 2962k -s 1280x536  big_buck_bunny_2962k.mp4
+x264 -p 2 -B 100 big_buck_bunny_720p_surround.avi -o big_buck_bunny_100.mp4
+x264 -p 2 -B 200 big_buck_bunny_720p_surround.avi -o big_buck_bunny_200.mp4
+x264 -p 2 -B 400 big_buck_bunny_720p_surround.avi -o big_buck_bunny_400.mp4
+x264 -p 2 -B 800 big_buck_bunny_720p_surround.avi -o big_buck_bunny_800.mp4
+x264 -p 2 -B 1200 big_buck_bunny_720p_surround.avi -o big_buck_bunny_1200.mp4
 }}}
 
 audio:

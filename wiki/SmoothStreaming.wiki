@@ -51,7 +51,7 @@ start the fragmentation with:
 java -jar smooth-streaming-fragmenter-[version].jar big_buck_bunny*.mp4
 }}}
 
-the result will be in the fragments directory.
+the result will be in the newly created 'smooth' directory. You could set the output directory via -o command line option. 
 
 
 = Streaming from google code's SVN =

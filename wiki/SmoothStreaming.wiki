@@ -24,7 +24,7 @@ This creates the first pass log file.
 x264 -p 1 -B 400 big_buck_bunny_720p_surround.avi statsfile
 }}}
 
-These commands use that log file (and create H263 with my ffmpeg - booooaaahhhh I hate encoding). 
+These commands use the first pass statistics to make sure that the I-frames are all on the same position.
 {{{
 x264 -p 2 -B 100 big_buck_bunny_720p_surround.avi -o big_buck_bunny_100.mp4
 x264 -p 2 -B 200 big_buck_bunny_720p_surround.avi -o big_buck_bunny_200.mp4

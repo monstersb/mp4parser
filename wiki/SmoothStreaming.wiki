@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The default deployment for MS Smooth Streaming requires an IIS. With some tricks we can use a default Apache without any configuration hassle.
+The default deployment for MS Smooth Streaming requires an IIS. With some tricks we can use a default Apache (or even this SVN) without any configuration hassle.
 
 
 = Preparing the content =

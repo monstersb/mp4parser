@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- http://www.adobe.com/crossdomain.xml -->
+<cross-domain-policy>
+<allow-access-from domain="*" />
+<allow-access-from domain="*" to-ports="9090" />
+</cross-domain-policy>

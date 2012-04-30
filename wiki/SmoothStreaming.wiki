@@ -57,5 +57,3 @@ the result will be in the newly created 'smooth' directory. You could set the ou
 = Streaming from google code's SVN =
 
 I now commit all files in the smooth directory to http://mp4parser.googlecode.com/svn/smooth/big_buck_bunny/ and create an HTML page at http://mp4parser.googlecode.com/svn/smooth/gcode.html  - Smooth Streaming from SVN! Isn't that cool?
-
-http://mp4parser.googlecode.com/svn/smooth/gcode.html

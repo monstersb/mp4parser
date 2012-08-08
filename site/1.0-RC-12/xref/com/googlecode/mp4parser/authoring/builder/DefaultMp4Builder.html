@@ -1,0 +1,588 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>DefaultMp4Builder xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../apidocs/com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">View Javadoc</a></div><pre>
+
+<a class="jxr_linenumber" name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright 2012 Sebastian Annies, Hamburg</em>
+<a class="jxr_linenumber" name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the License);</em>
+<a class="jxr_linenumber" name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a class="jxr_linenumber" name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a class="jxr_linenumber" name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a class="jxr_linenumber" name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a class="jxr_linenumber" name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an AS IS BASIS,</em>
+<a class="jxr_linenumber" name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a class="jxr_linenumber" name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a class="jxr_linenumber" name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a class="jxr_linenumber" name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> com.googlecode.mp4parser.authoring.builder;
+<a class="jxr_linenumber" name="17" href="#17">17</a>  
+<a class="jxr_linenumber" name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.BoxParser;
+<a class="jxr_linenumber" name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.IsoFile;
+<a class="jxr_linenumber" name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.IsoTypeWriter;
+<a class="jxr_linenumber" name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.Box;
+<a class="jxr_linenumber" name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.CompositionTimeToSample;
+<a class="jxr_linenumber" name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.ContainerBox;
+<a class="jxr_linenumber" name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.DataEntryUrlBox;
+<a class="jxr_linenumber" name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.DataInformationBox;
+<a class="jxr_linenumber" name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.DataReferenceBox;
+<a class="jxr_linenumber" name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.FileTypeBox;
+<a class="jxr_linenumber" name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.HandlerBox;
+<a class="jxr_linenumber" name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.MediaBox;
+<a class="jxr_linenumber" name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.MediaHeaderBox;
+<a class="jxr_linenumber" name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.MediaInformationBox;
+<a class="jxr_linenumber" name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.MovieBox;
+<a class="jxr_linenumber" name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.MovieHeaderBox;
+<a class="jxr_linenumber" name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.SampleDependencyTypeBox;
+<a class="jxr_linenumber" name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.SampleSizeBox;
+<a class="jxr_linenumber" name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.SampleTableBox;
+<a class="jxr_linenumber" name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.SampleToChunkBox;
+<a class="jxr_linenumber" name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.StaticChunkOffsetBox;
+<a class="jxr_linenumber" name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.SyncSampleBox;
+<a class="jxr_linenumber" name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.TimeToSampleBox;
+<a class="jxr_linenumber" name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.TrackBox;
+<a class="jxr_linenumber" name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> com.coremedia.iso.boxes.TrackHeaderBox;
+<a class="jxr_linenumber" name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> com.googlecode.mp4parser.authoring.DateHelper;
+<a class="jxr_linenumber" name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> com.googlecode.mp4parser.authoring.Movie;
+<a class="jxr_linenumber" name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> com.googlecode.mp4parser.authoring.Track;
+<a class="jxr_linenumber" name="46" href="#46">46</a>  
+<a class="jxr_linenumber" name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a class="jxr_linenumber" name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> java.nio.ByteBuffer;
+<a class="jxr_linenumber" name="49" href="#49">49</a>  <strong class="jxr_keyword">import</strong> java.nio.MappedByteBuffer;
+<a class="jxr_linenumber" name="50" href="#50">50</a>  <strong class="jxr_keyword">import</strong> java.nio.channels.GatheringByteChannel;
+<a class="jxr_linenumber" name="51" href="#51">51</a>  <strong class="jxr_keyword">import</strong> java.nio.channels.ReadableByteChannel;
+<a class="jxr_linenumber" name="52" href="#52">52</a>  <strong class="jxr_keyword">import</strong> java.nio.channels.WritableByteChannel;
+<a class="jxr_linenumber" name="53" href="#53">53</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a class="jxr_linenumber" name="54" href="#54">54</a>  <strong class="jxr_keyword">import</strong> java.util.Date;
+<a class="jxr_linenumber" name="55" href="#55">55</a>  <strong class="jxr_keyword">import</strong> java.util.HashMap;
+<a class="jxr_linenumber" name="56" href="#56">56</a>  <strong class="jxr_keyword">import</strong> java.util.HashSet;
+<a class="jxr_linenumber" name="57" href="#57">57</a>  <strong class="jxr_keyword">import</strong> java.util.LinkedList;
+<a class="jxr_linenumber" name="58" href="#58">58</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="59" href="#59">59</a>  <strong class="jxr_keyword">import</strong> java.util.Map;
+<a class="jxr_linenumber" name="60" href="#60">60</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
+<a class="jxr_linenumber" name="61" href="#61">61</a>  <strong class="jxr_keyword">import</strong> java.util.logging.Level;
+<a class="jxr_linenumber" name="62" href="#62">62</a>  <strong class="jxr_keyword">import</strong> java.util.logging.Logger;
+<a class="jxr_linenumber" name="63" href="#63">63</a>  
+<a class="jxr_linenumber" name="64" href="#64">64</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> com.googlecode.mp4parser.util.CastUtils.l2i;
+<a class="jxr_linenumber" name="65" href="#65">65</a>  
+<a class="jxr_linenumber" name="66" href="#66">66</a>  <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="67" href="#67">67</a>  <em class="jxr_javadoccomment"> * Creates a plain MP4 file from a video. Plain as plain can be.</em>
+<a class="jxr_linenumber" name="68" href="#68">68</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="69" href="#69">69</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">DefaultMp4Builder</a> <strong class="jxr_keyword">implements</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/Mp4Builder.html">Mp4Builder</a> {
+<a class="jxr_linenumber" name="70" href="#70">70</a>      Set&lt;StaticChunkOffsetBox&gt; chunkOffsetBoxes = <strong class="jxr_keyword">new</strong> HashSet&lt;StaticChunkOffsetBox&gt;();
+<a class="jxr_linenumber" name="71" href="#71">71</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Logger LOG = Logger.getLogger(DefaultMp4Builder.<strong class="jxr_keyword">class</strong>.getName());
+<a class="jxr_linenumber" name="72" href="#72">72</a>  
+<a class="jxr_linenumber" name="73" href="#73">73</a>      HashMap&lt;Track, List&lt;ByteBuffer&gt;&gt; track2Sample = <strong class="jxr_keyword">new</strong> HashMap&lt;Track, List&lt;ByteBuffer&gt;&gt;();
+<a class="jxr_linenumber" name="74" href="#74">74</a>      HashMap&lt;Track, <strong class="jxr_keyword">long</strong>[]&gt; track2SampleSizes = <strong class="jxr_keyword">new</strong> HashMap&lt;Track, <strong class="jxr_keyword">long</strong>[]&gt;();
+<a class="jxr_linenumber" name="75" href="#75">75</a>      <strong class="jxr_keyword">private</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/FragmentIntersectionFinder.html">FragmentIntersectionFinder</a> intersectionFinder = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/TwoSecondIntersectionFinder.html">TwoSecondIntersectionFinder</a>();
+<a class="jxr_linenumber" name="76" href="#76">76</a>  
+<a class="jxr_linenumber" name="77" href="#77">77</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setIntersectionFinder(<a href="../../../../../com/googlecode/mp4parser/authoring/builder/FragmentIntersectionFinder.html">FragmentIntersectionFinder</a> intersectionFinder) {
+<a class="jxr_linenumber" name="78" href="#78">78</a>          <strong class="jxr_keyword">this</strong>.intersectionFinder = intersectionFinder;
+<a class="jxr_linenumber" name="79" href="#79">79</a>      }
+<a class="jxr_linenumber" name="80" href="#80">80</a>  
+<a class="jxr_linenumber" name="81" href="#81">81</a>      <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="82" href="#82">82</a>  <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="83" href="#83">83</a>  <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="84" href="#84">84</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../com/coremedia/iso/IsoFile.html">IsoFile</a> build(<a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="85" href="#85">85</a>          LOG.fine(<span class="jxr_string">"Creating movie "</span> + movie);
+<a class="jxr_linenumber" name="86" href="#86">86</a>          <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="87" href="#87">87</a>              <em class="jxr_comment">// getting the samples may be a time consuming activity</em>
+<a class="jxr_linenumber" name="88" href="#88">88</a>              List&lt;ByteBuffer&gt; samples = track.getSamples();
+<a class="jxr_linenumber" name="89" href="#89">89</a>              putSamples(track, samples);
+<a class="jxr_linenumber" name="90" href="#90">90</a>              <strong class="jxr_keyword">long</strong>[] sizes = <strong class="jxr_keyword">new</strong> <strong class="jxr_keyword">long</strong>[samples.size()];
+<a class="jxr_linenumber" name="91" href="#91">91</a>              <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; sizes.length; i++) {
+<a class="jxr_linenumber" name="92" href="#92">92</a>                  sizes[i] = samples.get(i).limit();
+<a class="jxr_linenumber" name="93" href="#93">93</a>              }
+<a class="jxr_linenumber" name="94" href="#94">94</a>              putSampleSizes(track, sizes);
+<a class="jxr_linenumber" name="95" href="#95">95</a>          }
+<a class="jxr_linenumber" name="96" href="#96">96</a>  
+<a class="jxr_linenumber" name="97" href="#97">97</a>          <a href="../../../../../com/coremedia/iso/IsoFile.html">IsoFile</a> isoFile = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/IsoFile.html">IsoFile</a>();
+<a class="jxr_linenumber" name="98" href="#98">98</a>          <em class="jxr_comment">// ouch that is ugly but I don't know how to do it else</em>
+<a class="jxr_linenumber" name="99" href="#99">99</a>          List&lt;String&gt; minorBrands = <strong class="jxr_keyword">new</strong> LinkedList&lt;String&gt;();
+<a class="jxr_linenumber" name="100" href="#100">100</a>         minorBrands.add(<span class="jxr_string">"isom"</span>);
+<a class="jxr_linenumber" name="101" href="#101">101</a>         minorBrands.add(<span class="jxr_string">"iso2"</span>);
+<a class="jxr_linenumber" name="102" href="#102">102</a>         minorBrands.add(<span class="jxr_string">"avc1"</span>);
+<a class="jxr_linenumber" name="103" href="#103">103</a> 
+<a class="jxr_linenumber" name="104" href="#104">104</a>         isoFile.addBox(<strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/FileTypeBox.html">FileTypeBox</a>(<span class="jxr_string">"isom"</span>, 0, minorBrands));
+<a class="jxr_linenumber" name="105" href="#105">105</a>         isoFile.addBox(createMovieBox(movie));
+<a class="jxr_linenumber" name="106" href="#106">106</a>         <a href="../../../../../com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">InterleaveChunkMdat</a> mdat = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">InterleaveChunkMdat</a>(movie);
+<a class="jxr_linenumber" name="107" href="#107">107</a>         isoFile.addBox(mdat);
+<a class="jxr_linenumber" name="108" href="#108">108</a> 
+<a class="jxr_linenumber" name="109" href="#109">109</a>         <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="110" href="#110">110</a> <em class="jxr_comment">        dataOffset is where the first sample starts. In this special mdat the samples always start</em>
+<a class="jxr_linenumber" name="111" href="#111">111</a> <em class="jxr_comment">        at offset 16 so that we can use the same offset for large boxes and small boxes</em>
+<a class="jxr_linenumber" name="112" href="#112">112</a> <em class="jxr_comment">         */</em>
+<a class="jxr_linenumber" name="113" href="#113">113</a>         <strong class="jxr_keyword">long</strong> dataOffset = mdat.getDataOffset();
+<a class="jxr_linenumber" name="114" href="#114">114</a>         <strong class="jxr_keyword">for</strong> (StaticChunkOffsetBox chunkOffsetBox : chunkOffsetBoxes) {
+<a class="jxr_linenumber" name="115" href="#115">115</a>             <strong class="jxr_keyword">long</strong>[] offsets = chunkOffsetBox.getChunkOffsets();
+<a class="jxr_linenumber" name="116" href="#116">116</a>             <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; offsets.length; i++) {
+<a class="jxr_linenumber" name="117" href="#117">117</a>                 offsets[i] += dataOffset;
+<a class="jxr_linenumber" name="118" href="#118">118</a>             }
+<a class="jxr_linenumber" name="119" href="#119">119</a>         }
+<a class="jxr_linenumber" name="120" href="#120">120</a> 
+<a class="jxr_linenumber" name="121" href="#121">121</a> 
+<a class="jxr_linenumber" name="122" href="#122">122</a>         <strong class="jxr_keyword">return</strong> isoFile;
+<a class="jxr_linenumber" name="123" href="#123">123</a>     }
+<a class="jxr_linenumber" name="124" href="#124">124</a> 
+<a class="jxr_linenumber" name="125" href="#125">125</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/FragmentIntersectionFinder.html">FragmentIntersectionFinder</a> getFragmentIntersectionFinder() {
+<a class="jxr_linenumber" name="126" href="#126">126</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UnsupportedOperationException(<span class="jxr_string">"No fragment intersection finder in default MP4 builder!"</span>);
+<a class="jxr_linenumber" name="127" href="#127">127</a>     }
+<a class="jxr_linenumber" name="128" href="#128">128</a> 
+<a class="jxr_linenumber" name="129" href="#129">129</a>     <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">long</strong>[] putSampleSizes(<a href="../../../../../com/googlecode/mp4parser/authoring/Track.html">Track</a> track, <strong class="jxr_keyword">long</strong>[] sizes) {
+<a class="jxr_linenumber" name="130" href="#130">130</a>         <strong class="jxr_keyword">return</strong> track2SampleSizes.put(track, sizes);
+<a class="jxr_linenumber" name="131" href="#131">131</a>     }
+<a class="jxr_linenumber" name="132" href="#132">132</a> 
+<a class="jxr_linenumber" name="133" href="#133">133</a>     <strong class="jxr_keyword">protected</strong> List&lt;ByteBuffer&gt; putSamples(<a href="../../../../../com/googlecode/mp4parser/authoring/Track.html">Track</a> track, List&lt;ByteBuffer&gt; samples) {
+<a class="jxr_linenumber" name="134" href="#134">134</a>         <strong class="jxr_keyword">return</strong> track2Sample.put(track, samples);
+<a class="jxr_linenumber" name="135" href="#135">135</a>     }
+<a class="jxr_linenumber" name="136" href="#136">136</a> 
+<a class="jxr_linenumber" name="137" href="#137">137</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../com/coremedia/iso/boxes/MovieBox.html">MovieBox</a> createMovieBox(<a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="138" href="#138">138</a>         <a href="../../../../../com/coremedia/iso/boxes/MovieBox.html">MovieBox</a> movieBox = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/MovieBox.html">MovieBox</a>();
+<a class="jxr_linenumber" name="139" href="#139">139</a>         <a href="../../../../../com/coremedia/iso/boxes/MovieHeaderBox.html">MovieHeaderBox</a> mvhd = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/MovieHeaderBox.html">MovieHeaderBox</a>();
+<a class="jxr_linenumber" name="140" href="#140">140</a> 
+<a class="jxr_linenumber" name="141" href="#141">141</a>         mvhd.setCreationTime(DateHelper.convert(<strong class="jxr_keyword">new</strong> Date()));
+<a class="jxr_linenumber" name="142" href="#142">142</a>         mvhd.setModificationTime(DateHelper.convert(<strong class="jxr_keyword">new</strong> Date()));
+<a class="jxr_linenumber" name="143" href="#143">143</a> 
+<a class="jxr_linenumber" name="144" href="#144">144</a>         <strong class="jxr_keyword">long</strong> movieTimeScale = getTimescale(movie);
+<a class="jxr_linenumber" name="145" href="#145">145</a>         <strong class="jxr_keyword">long</strong> duration = 0;
+<a class="jxr_linenumber" name="146" href="#146">146</a> 
+<a class="jxr_linenumber" name="147" href="#147">147</a>         <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="148" href="#148">148</a>             <strong class="jxr_keyword">long</strong> tracksDuration = getDuration(track) * movieTimeScale / track.getTrackMetaData().getTimescale();
+<a class="jxr_linenumber" name="149" href="#149">149</a>             <strong class="jxr_keyword">if</strong> (tracksDuration &gt; duration) {
+<a class="jxr_linenumber" name="150" href="#150">150</a>                 duration = tracksDuration;
+<a class="jxr_linenumber" name="151" href="#151">151</a>             }
+<a class="jxr_linenumber" name="152" href="#152">152</a> 
+<a class="jxr_linenumber" name="153" href="#153">153</a> 
+<a class="jxr_linenumber" name="154" href="#154">154</a>         }
+<a class="jxr_linenumber" name="155" href="#155">155</a> 
+<a class="jxr_linenumber" name="156" href="#156">156</a>         mvhd.setDuration(duration);
+<a class="jxr_linenumber" name="157" href="#157">157</a>         mvhd.setTimescale(movieTimeScale);
+<a class="jxr_linenumber" name="158" href="#158">158</a>         <em class="jxr_comment">// find the next available trackId</em>
+<a class="jxr_linenumber" name="159" href="#159">159</a>         <strong class="jxr_keyword">long</strong> nextTrackId = 0;
+<a class="jxr_linenumber" name="160" href="#160">160</a>         <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="161" href="#161">161</a>             nextTrackId = nextTrackId &lt; track.getTrackMetaData().getTrackId() ? track.getTrackMetaData().getTrackId() : nextTrackId;
+<a class="jxr_linenumber" name="162" href="#162">162</a>         }
+<a class="jxr_linenumber" name="163" href="#163">163</a>         mvhd.setNextTrackId(++nextTrackId);
+<a class="jxr_linenumber" name="164" href="#164">164</a>         <strong class="jxr_keyword">if</strong> (mvhd.getCreationTime() &gt;= 1l &lt;&lt; 32 ||
+<a class="jxr_linenumber" name="165" href="#165">165</a>                 mvhd.getModificationTime() &gt;= 1l &lt;&lt; 32 ||
+<a class="jxr_linenumber" name="166" href="#166">166</a>                 mvhd.getDuration() &gt;= 1l &lt;&lt; 32) {
+<a class="jxr_linenumber" name="167" href="#167">167</a>             mvhd.setVersion(1);
+<a class="jxr_linenumber" name="168" href="#168">168</a>         }
+<a class="jxr_linenumber" name="169" href="#169">169</a> 
+<a class="jxr_linenumber" name="170" href="#170">170</a>         movieBox.addBox(mvhd);
+<a class="jxr_linenumber" name="171" href="#171">171</a>         <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="172" href="#172">172</a>             movieBox.addBox(createTrackBox(track, movie));
+<a class="jxr_linenumber" name="173" href="#173">173</a>         }
+<a class="jxr_linenumber" name="174" href="#174">174</a>         <em class="jxr_comment">// metadata here</em>
+<a class="jxr_linenumber" name="175" href="#175">175</a>         <a href="../../../../../com/coremedia/iso/boxes/Box.html">Box</a> udta = createUdta(movie);
+<a class="jxr_linenumber" name="176" href="#176">176</a>         <strong class="jxr_keyword">if</strong> (udta != <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="177" href="#177">177</a>             movieBox.addBox(udta);
+<a class="jxr_linenumber" name="178" href="#178">178</a>         }
+<a class="jxr_linenumber" name="179" href="#179">179</a>         <strong class="jxr_keyword">return</strong> movieBox;
+<a class="jxr_linenumber" name="180" href="#180">180</a> 
+<a class="jxr_linenumber" name="181" href="#181">181</a>     }
+<a class="jxr_linenumber" name="182" href="#182">182</a> 
+<a class="jxr_linenumber" name="183" href="#183">183</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="184" href="#184">184</a> <em class="jxr_javadoccomment">     * Override to create a user data box that may contain metadata.</em>
+<a class="jxr_linenumber" name="185" href="#185">185</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="186" href="#186">186</a> <em class="jxr_javadoccomment">     * @return a 'udta' box or &lt;code&gt;null&lt;/code&gt; if none provided</em>
+<a class="jxr_linenumber" name="187" href="#187">187</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="188" href="#188">188</a>     <strong class="jxr_keyword">protected</strong> <a href="../../../../../com/coremedia/iso/boxes/Box.html">Box</a> createUdta(<a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="189" href="#189">189</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="190" href="#190">190</a>     }
+<a class="jxr_linenumber" name="191" href="#191">191</a> 
+<a class="jxr_linenumber" name="192" href="#192">192</a>     <strong class="jxr_keyword">private</strong> <a href="../../../../../com/coremedia/iso/boxes/TrackBox.html">TrackBox</a> createTrackBox(<a href="../../../../../com/googlecode/mp4parser/authoring/Track.html">Track</a> track, <a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="193" href="#193">193</a> 
+<a class="jxr_linenumber" name="194" href="#194">194</a>         LOG.info(<span class="jxr_string">"Creating Mp4TrackImpl "</span> + track);
+<a class="jxr_linenumber" name="195" href="#195">195</a>         <a href="../../../../../com/coremedia/iso/boxes/TrackBox.html">TrackBox</a> trackBox = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/TrackBox.html">TrackBox</a>();
+<a class="jxr_linenumber" name="196" href="#196">196</a>         <a href="../../../../../com/coremedia/iso/boxes/TrackHeaderBox.html">TrackHeaderBox</a> tkhd = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/TrackHeaderBox.html">TrackHeaderBox</a>();
+<a class="jxr_linenumber" name="197" href="#197">197</a>         <strong class="jxr_keyword">int</strong> flags = 0;
+<a class="jxr_linenumber" name="198" href="#198">198</a>         <strong class="jxr_keyword">if</strong> (track.isEnabled()) {
+<a class="jxr_linenumber" name="199" href="#199">199</a>             flags += 1;
+<a class="jxr_linenumber" name="200" href="#200">200</a>         }
+<a class="jxr_linenumber" name="201" href="#201">201</a> 
+<a class="jxr_linenumber" name="202" href="#202">202</a>         <strong class="jxr_keyword">if</strong> (track.isInMovie()) {
+<a class="jxr_linenumber" name="203" href="#203">203</a>             flags += 2;
+<a class="jxr_linenumber" name="204" href="#204">204</a>         }
+<a class="jxr_linenumber" name="205" href="#205">205</a> 
+<a class="jxr_linenumber" name="206" href="#206">206</a>         <strong class="jxr_keyword">if</strong> (track.isInPreview()) {
+<a class="jxr_linenumber" name="207" href="#207">207</a>             flags += 4;
+<a class="jxr_linenumber" name="208" href="#208">208</a>         }
+<a class="jxr_linenumber" name="209" href="#209">209</a> 
+<a class="jxr_linenumber" name="210" href="#210">210</a>         <strong class="jxr_keyword">if</strong> (track.isInPoster()) {
+<a class="jxr_linenumber" name="211" href="#211">211</a>             flags += 8;
+<a class="jxr_linenumber" name="212" href="#212">212</a>         }
+<a class="jxr_linenumber" name="213" href="#213">213</a>         tkhd.setFlags(flags);
+<a class="jxr_linenumber" name="214" href="#214">214</a> 
+<a class="jxr_linenumber" name="215" href="#215">215</a>         tkhd.setAlternateGroup(track.getTrackMetaData().getGroup());
+<a class="jxr_linenumber" name="216" href="#216">216</a>         tkhd.setCreationTime(DateHelper.convert(track.getTrackMetaData().getCreationTime()));
+<a class="jxr_linenumber" name="217" href="#217">217</a>         <em class="jxr_comment">// We need to take edit list box into account in trackheader duration</em>
+<a class="jxr_linenumber" name="218" href="#218">218</a>         <em class="jxr_comment">// but as long as I don't support edit list boxes it is sufficient to</em>
+<a class="jxr_linenumber" name="219" href="#219">219</a>         <em class="jxr_comment">// just translate media duration to movie timescale</em>
+<a class="jxr_linenumber" name="220" href="#220">220</a>         tkhd.setDuration(getDuration(track) * getTimescale(movie) / track.getTrackMetaData().getTimescale());
+<a class="jxr_linenumber" name="221" href="#221">221</a>         tkhd.setHeight(track.getTrackMetaData().getHeight());
+<a class="jxr_linenumber" name="222" href="#222">222</a>         tkhd.setWidth(track.getTrackMetaData().getWidth());
+<a class="jxr_linenumber" name="223" href="#223">223</a>         tkhd.setLayer(track.getTrackMetaData().getLayer());
+<a class="jxr_linenumber" name="224" href="#224">224</a>         tkhd.setModificationTime(DateHelper.convert(<strong class="jxr_keyword">new</strong> Date()));
+<a class="jxr_linenumber" name="225" href="#225">225</a>         tkhd.setTrackId(track.getTrackMetaData().getTrackId());
+<a class="jxr_linenumber" name="226" href="#226">226</a>         tkhd.setVolume(track.getTrackMetaData().getVolume());
+<a class="jxr_linenumber" name="227" href="#227">227</a>         <strong class="jxr_keyword">if</strong> (tkhd.getCreationTime() &gt;= 1l &lt;&lt; 32 ||
+<a class="jxr_linenumber" name="228" href="#228">228</a>                 tkhd.getModificationTime() &gt;= 1l &lt;&lt; 32 ||
+<a class="jxr_linenumber" name="229" href="#229">229</a>                 tkhd.getDuration() &gt;= 1l &lt;&lt; 32) {
+<a class="jxr_linenumber" name="230" href="#230">230</a>             tkhd.setVersion(1);
+<a class="jxr_linenumber" name="231" href="#231">231</a>         }
+<a class="jxr_linenumber" name="232" href="#232">232</a> 
+<a class="jxr_linenumber" name="233" href="#233">233</a>         trackBox.addBox(tkhd);
+<a class="jxr_linenumber" name="234" href="#234">234</a> 
+<a class="jxr_linenumber" name="235" href="#235">235</a> <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="236" href="#236">236</a> <em class="jxr_comment">        EditBox edit = new EditBox();</em>
+<a class="jxr_linenumber" name="237" href="#237">237</a> <em class="jxr_comment">        EditListBox editListBox = new EditListBox();</em>
+<a class="jxr_linenumber" name="238" href="#238">238</a> <em class="jxr_comment">        editListBox.setEntries(Collections.singletonList(</em>
+<a class="jxr_linenumber" name="239" href="#239">239</a> <em class="jxr_comment">                new EditListBox.Entry(editListBox, (long) (track.getTrackMetaData().getStartTime() * getTimescale(movie)), -1, 1)));</em>
+<a class="jxr_linenumber" name="240" href="#240">240</a> <em class="jxr_comment">        edit.addBox(editListBox);</em>
+<a class="jxr_linenumber" name="241" href="#241">241</a> <em class="jxr_comment">        trackBox.addBox(edit);</em>
+<a class="jxr_linenumber" name="242" href="#242">242</a> <em class="jxr_comment">*/</em>
+<a class="jxr_linenumber" name="243" href="#243">243</a> 
+<a class="jxr_linenumber" name="244" href="#244">244</a>         <a href="../../../../../com/coremedia/iso/boxes/MediaBox.html">MediaBox</a> mdia = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/MediaBox.html">MediaBox</a>();
+<a class="jxr_linenumber" name="245" href="#245">245</a>         trackBox.addBox(mdia);
+<a class="jxr_linenumber" name="246" href="#246">246</a>         <a href="../../../../../com/coremedia/iso/boxes/MediaHeaderBox.html">MediaHeaderBox</a> mdhd = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/MediaHeaderBox.html">MediaHeaderBox</a>();
+<a class="jxr_linenumber" name="247" href="#247">247</a>         mdhd.setCreationTime(DateHelper.convert(track.getTrackMetaData().getCreationTime()));
+<a class="jxr_linenumber" name="248" href="#248">248</a>         mdhd.setDuration(getDuration(track));
+<a class="jxr_linenumber" name="249" href="#249">249</a>         mdhd.setTimescale(track.getTrackMetaData().getTimescale());
+<a class="jxr_linenumber" name="250" href="#250">250</a>         mdhd.setLanguage(track.getTrackMetaData().getLanguage());
+<a class="jxr_linenumber" name="251" href="#251">251</a>         mdia.addBox(mdhd);
+<a class="jxr_linenumber" name="252" href="#252">252</a>         <a href="../../../../../com/coremedia/iso/boxes/HandlerBox.html">HandlerBox</a> hdlr = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/HandlerBox.html">HandlerBox</a>();
+<a class="jxr_linenumber" name="253" href="#253">253</a>         mdia.addBox(hdlr);
+<a class="jxr_linenumber" name="254" href="#254">254</a> 
+<a class="jxr_linenumber" name="255" href="#255">255</a>         hdlr.setHandlerType(track.getHandler());
+<a class="jxr_linenumber" name="256" href="#256">256</a> 
+<a class="jxr_linenumber" name="257" href="#257">257</a>         <a href="../../../../../com/coremedia/iso/boxes/MediaInformationBox.html">MediaInformationBox</a> minf = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/MediaInformationBox.html">MediaInformationBox</a>();
+<a class="jxr_linenumber" name="258" href="#258">258</a>         minf.addBox(track.getMediaHeaderBox());
+<a class="jxr_linenumber" name="259" href="#259">259</a> 
+<a class="jxr_linenumber" name="260" href="#260">260</a>         <em class="jxr_comment">// dinf: all these three boxes tell us is that the actual</em>
+<a class="jxr_linenumber" name="261" href="#261">261</a>         <em class="jxr_comment">// data is in the current file and not somewhere external</em>
+<a class="jxr_linenumber" name="262" href="#262">262</a>         <a href="../../../../../com/coremedia/iso/boxes/DataInformationBox.html">DataInformationBox</a> dinf = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/DataInformationBox.html">DataInformationBox</a>();
+<a class="jxr_linenumber" name="263" href="#263">263</a>         <a href="../../../../../com/coremedia/iso/boxes/DataReferenceBox.html">DataReferenceBox</a> dref = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/DataReferenceBox.html">DataReferenceBox</a>();
+<a class="jxr_linenumber" name="264" href="#264">264</a>         dinf.addBox(dref);
+<a class="jxr_linenumber" name="265" href="#265">265</a>         <a href="../../../../../com/coremedia/iso/boxes/DataEntryUrlBox.html">DataEntryUrlBox</a> url = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/DataEntryUrlBox.html">DataEntryUrlBox</a>();
+<a class="jxr_linenumber" name="266" href="#266">266</a>         url.setFlags(1);
+<a class="jxr_linenumber" name="267" href="#267">267</a>         dref.addBox(url);
+<a class="jxr_linenumber" name="268" href="#268">268</a>         minf.addBox(dinf);
+<a class="jxr_linenumber" name="269" href="#269">269</a>         <em class="jxr_comment">//</em>
+<a class="jxr_linenumber" name="270" href="#270">270</a> 
+<a class="jxr_linenumber" name="271" href="#271">271</a>         <a href="../../../../../com/coremedia/iso/boxes/SampleTableBox.html">SampleTableBox</a> stbl = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/SampleTableBox.html">SampleTableBox</a>();
+<a class="jxr_linenumber" name="272" href="#272">272</a> 
+<a class="jxr_linenumber" name="273" href="#273">273</a>         stbl.addBox(track.getSampleDescriptionBox());
+<a class="jxr_linenumber" name="274" href="#274">274</a> 
+<a class="jxr_linenumber" name="275" href="#275">275</a>         List&lt;TimeToSampleBox.Entry&gt; decodingTimeToSampleEntries = track.getDecodingTimeEntries();
+<a class="jxr_linenumber" name="276" href="#276">276</a>         <strong class="jxr_keyword">if</strong> (decodingTimeToSampleEntries != <strong class="jxr_keyword">null</strong> &amp;&amp; !track.getDecodingTimeEntries().isEmpty()) {
+<a class="jxr_linenumber" name="277" href="#277">277</a>             <a href="../../../../../com/coremedia/iso/boxes/TimeToSampleBox.html">TimeToSampleBox</a> stts = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/TimeToSampleBox.html">TimeToSampleBox</a>();
+<a class="jxr_linenumber" name="278" href="#278">278</a>             stts.setEntries(track.getDecodingTimeEntries());
+<a class="jxr_linenumber" name="279" href="#279">279</a>             stbl.addBox(stts);
+<a class="jxr_linenumber" name="280" href="#280">280</a>         }
+<a class="jxr_linenumber" name="281" href="#281">281</a> 
+<a class="jxr_linenumber" name="282" href="#282">282</a>         List&lt;CompositionTimeToSample.Entry&gt; compositionTimeToSampleEntries = track.getCompositionTimeEntries();
+<a class="jxr_linenumber" name="283" href="#283">283</a>         <strong class="jxr_keyword">if</strong> (compositionTimeToSampleEntries != <strong class="jxr_keyword">null</strong> &amp;&amp; !compositionTimeToSampleEntries.isEmpty()) {
+<a class="jxr_linenumber" name="284" href="#284">284</a>             <a href="../../../../../com/coremedia/iso/boxes/CompositionTimeToSample.html">CompositionTimeToSample</a> ctts = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/CompositionTimeToSample.html">CompositionTimeToSample</a>();
+<a class="jxr_linenumber" name="285" href="#285">285</a>             ctts.setEntries(compositionTimeToSampleEntries);
+<a class="jxr_linenumber" name="286" href="#286">286</a>             stbl.addBox(ctts);
+<a class="jxr_linenumber" name="287" href="#287">287</a>         }
+<a class="jxr_linenumber" name="288" href="#288">288</a> 
+<a class="jxr_linenumber" name="289" href="#289">289</a>         <strong class="jxr_keyword">long</strong>[] syncSamples = track.getSyncSamples();
+<a class="jxr_linenumber" name="290" href="#290">290</a>         <strong class="jxr_keyword">if</strong> (syncSamples != <strong class="jxr_keyword">null</strong> &amp;&amp; syncSamples.length &gt; 0) {
+<a class="jxr_linenumber" name="291" href="#291">291</a>             <a href="../../../../../com/coremedia/iso/boxes/SyncSampleBox.html">SyncSampleBox</a> stss = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/SyncSampleBox.html">SyncSampleBox</a>();
+<a class="jxr_linenumber" name="292" href="#292">292</a>             stss.setSampleNumber(syncSamples);
+<a class="jxr_linenumber" name="293" href="#293">293</a>             stbl.addBox(stss);
+<a class="jxr_linenumber" name="294" href="#294">294</a>         }
+<a class="jxr_linenumber" name="295" href="#295">295</a> 
+<a class="jxr_linenumber" name="296" href="#296">296</a>         <strong class="jxr_keyword">if</strong> (track.getSampleDependencies() != <strong class="jxr_keyword">null</strong> &amp;&amp; !track.getSampleDependencies().isEmpty()) {
+<a class="jxr_linenumber" name="297" href="#297">297</a>             <a href="../../../../../com/coremedia/iso/boxes/SampleDependencyTypeBox.html">SampleDependencyTypeBox</a> sdtp = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/SampleDependencyTypeBox.html">SampleDependencyTypeBox</a>();
+<a class="jxr_linenumber" name="298" href="#298">298</a>             sdtp.setEntries(track.getSampleDependencies());
+<a class="jxr_linenumber" name="299" href="#299">299</a>             stbl.addBox(sdtp);
+<a class="jxr_linenumber" name="300" href="#300">300</a>         }
+<a class="jxr_linenumber" name="301" href="#301">301</a>         HashMap&lt;Track, <strong class="jxr_keyword">int</strong>[]&gt; track2ChunkSizes = <strong class="jxr_keyword">new</strong> HashMap&lt;Track, <strong class="jxr_keyword">int</strong>[]&gt;();
+<a class="jxr_linenumber" name="302" href="#302">302</a>         <strong class="jxr_keyword">for</strong> (Track current : movie.getTracks()) {
+<a class="jxr_linenumber" name="303" href="#303">303</a>             track2ChunkSizes.put(current, getChunkSizes(current, movie));
+<a class="jxr_linenumber" name="304" href="#304">304</a>         }
+<a class="jxr_linenumber" name="305" href="#305">305</a>         <strong class="jxr_keyword">int</strong>[] tracksChunkSizes = track2ChunkSizes.get(track);
+<a class="jxr_linenumber" name="306" href="#306">306</a> 
+<a class="jxr_linenumber" name="307" href="#307">307</a>         <a href="../../../../../com/coremedia/iso/boxes/SampleToChunkBox.html">SampleToChunkBox</a> stsc = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/SampleToChunkBox.html">SampleToChunkBox</a>();
+<a class="jxr_linenumber" name="308" href="#308">308</a>         stsc.setEntries(<strong class="jxr_keyword">new</strong> LinkedList&lt;SampleToChunkBox.Entry&gt;());
+<a class="jxr_linenumber" name="309" href="#309">309</a>         <strong class="jxr_keyword">long</strong> lastChunkSize = Integer.MIN_VALUE; <em class="jxr_comment">// to be sure the first chunks hasn't got the same size</em>
+<a class="jxr_linenumber" name="310" href="#310">310</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; tracksChunkSizes.length; i++) {
+<a class="jxr_linenumber" name="311" href="#311">311</a>             <em class="jxr_comment">// The sample description index references the sample description box</em>
+<a class="jxr_linenumber" name="312" href="#312">312</a>             <em class="jxr_comment">// that describes the samples of this chunk. My Tracks cannot have more</em>
+<a class="jxr_linenumber" name="313" href="#313">313</a>             <em class="jxr_comment">// than one sample description box. Therefore 1 is always right</em>
+<a class="jxr_linenumber" name="314" href="#314">314</a>             <em class="jxr_comment">// the first chunk has the number '1'</em>
+<a class="jxr_linenumber" name="315" href="#315">315</a>             <strong class="jxr_keyword">if</strong> (lastChunkSize != tracksChunkSizes[i]) {
+<a class="jxr_linenumber" name="316" href="#316">316</a>                 stsc.getEntries().add(<strong class="jxr_keyword">new</strong> SampleToChunkBox.Entry(i + 1, tracksChunkSizes[i], 1));
+<a class="jxr_linenumber" name="317" href="#317">317</a>                 lastChunkSize = tracksChunkSizes[i];
+<a class="jxr_linenumber" name="318" href="#318">318</a>             }
+<a class="jxr_linenumber" name="319" href="#319">319</a>         }
+<a class="jxr_linenumber" name="320" href="#320">320</a>         stbl.addBox(stsc);
+<a class="jxr_linenumber" name="321" href="#321">321</a> 
+<a class="jxr_linenumber" name="322" href="#322">322</a>         <a href="../../../../../com/coremedia/iso/boxes/SampleSizeBox.html">SampleSizeBox</a> stsz = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/SampleSizeBox.html">SampleSizeBox</a>();
+<a class="jxr_linenumber" name="323" href="#323">323</a>         stsz.setSampleSizes(track2SampleSizes.get(track));
+<a class="jxr_linenumber" name="324" href="#324">324</a> 
+<a class="jxr_linenumber" name="325" href="#325">325</a>         stbl.addBox(stsz);
+<a class="jxr_linenumber" name="326" href="#326">326</a>         <em class="jxr_comment">// The ChunkOffsetBox we create here is just a stub</em>
+<a class="jxr_linenumber" name="327" href="#327">327</a>         <em class="jxr_comment">// since we haven't created the whole structure we can't tell where the</em>
+<a class="jxr_linenumber" name="328" href="#328">328</a>         <em class="jxr_comment">// first chunk starts (mdat box). So I just let the chunk offset</em>
+<a class="jxr_linenumber" name="329" href="#329">329</a>         <em class="jxr_comment">// start at zero and I will add the mdat offset later.</em>
+<a class="jxr_linenumber" name="330" href="#330">330</a>         <a href="../../../../../com/coremedia/iso/boxes/StaticChunkOffsetBox.html">StaticChunkOffsetBox</a> stco = <strong class="jxr_keyword">new</strong> <a href="../../../../../com/coremedia/iso/boxes/StaticChunkOffsetBox.html">StaticChunkOffsetBox</a>();
+<a class="jxr_linenumber" name="331" href="#331">331</a>         <strong class="jxr_keyword">this</strong>.chunkOffsetBoxes.add(stco);
+<a class="jxr_linenumber" name="332" href="#332">332</a>         <strong class="jxr_keyword">long</strong> offset = 0;
+<a class="jxr_linenumber" name="333" href="#333">333</a>         <strong class="jxr_keyword">long</strong>[] chunkOffset = <strong class="jxr_keyword">new</strong> <strong class="jxr_keyword">long</strong>[tracksChunkSizes.length];
+<a class="jxr_linenumber" name="334" href="#334">334</a>         <em class="jxr_comment">// all tracks have the same number of chunks</em>
+<a class="jxr_linenumber" name="335" href="#335">335</a>         <strong class="jxr_keyword">if</strong> (LOG.isLoggable(Level.FINE)) {
+<a class="jxr_linenumber" name="336" href="#336">336</a>             LOG.fine(<span class="jxr_string">"Calculating chunk offsets for track_"</span> + track.getTrackMetaData().getTrackId());
+<a class="jxr_linenumber" name="337" href="#337">337</a>         }
+<a class="jxr_linenumber" name="338" href="#338">338</a> 
+<a class="jxr_linenumber" name="339" href="#339">339</a> 
+<a class="jxr_linenumber" name="340" href="#340">340</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; tracksChunkSizes.length; i++) {
+<a class="jxr_linenumber" name="341" href="#341">341</a>             <em class="jxr_comment">// The filelayout will be:</em>
+<a class="jxr_linenumber" name="342" href="#342">342</a>             <em class="jxr_comment">// chunk_1_track_1,... ,chunk_1_track_n, chunk_2_track_1,... ,chunk_2_track_n, ... , chunk_m_track_1,... ,chunk_m_track_n</em>
+<a class="jxr_linenumber" name="343" href="#343">343</a>             <em class="jxr_comment">// calculating the offsets</em>
+<a class="jxr_linenumber" name="344" href="#344">344</a>             <strong class="jxr_keyword">if</strong> (LOG.isLoggable(Level.FINER)) {
+<a class="jxr_linenumber" name="345" href="#345">345</a>                 LOG.finer(<span class="jxr_string">"Calculating chunk offsets for track_"</span> + track.getTrackMetaData().getTrackId() + <span class="jxr_string">" chunk "</span> + i);
+<a class="jxr_linenumber" name="346" href="#346">346</a>             }
+<a class="jxr_linenumber" name="347" href="#347">347</a>             <strong class="jxr_keyword">for</strong> (Track current : movie.getTracks()) {
+<a class="jxr_linenumber" name="348" href="#348">348</a>                 <strong class="jxr_keyword">if</strong> (LOG.isLoggable(Level.FINEST)) {
+<a class="jxr_linenumber" name="349" href="#349">349</a>                     LOG.finest(<span class="jxr_string">"Adding offsets of track_"</span> + current.getTrackMetaData().getTrackId());
+<a class="jxr_linenumber" name="350" href="#350">350</a>                 }
+<a class="jxr_linenumber" name="351" href="#351">351</a>                 <strong class="jxr_keyword">int</strong>[] chunkSizes = track2ChunkSizes.get(current);
+<a class="jxr_linenumber" name="352" href="#352">352</a>                 <strong class="jxr_keyword">long</strong> firstSampleOfChunk = 0;
+<a class="jxr_linenumber" name="353" href="#353">353</a>                 <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = 0; j &lt; i; j++) {
+<a class="jxr_linenumber" name="354" href="#354">354</a>                     firstSampleOfChunk += chunkSizes[j];
+<a class="jxr_linenumber" name="355" href="#355">355</a>                 }
+<a class="jxr_linenumber" name="356" href="#356">356</a>                 <strong class="jxr_keyword">if</strong> (current == track) {
+<a class="jxr_linenumber" name="357" href="#357">357</a>                     chunkOffset[i] = offset;
+<a class="jxr_linenumber" name="358" href="#358">358</a>                 }
+<a class="jxr_linenumber" name="359" href="#359">359</a>                 <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = l2i(firstSampleOfChunk); j &lt; firstSampleOfChunk + chunkSizes[i]; j++) {
+<a class="jxr_linenumber" name="360" href="#360">360</a>                     offset += track2SampleSizes.get(current)[j];
+<a class="jxr_linenumber" name="361" href="#361">361</a>                 }
+<a class="jxr_linenumber" name="362" href="#362">362</a>             }
+<a class="jxr_linenumber" name="363" href="#363">363</a>         }
+<a class="jxr_linenumber" name="364" href="#364">364</a>         stco.setChunkOffsets(chunkOffset);
+<a class="jxr_linenumber" name="365" href="#365">365</a>         stbl.addBox(stco);
+<a class="jxr_linenumber" name="366" href="#366">366</a>         minf.addBox(stbl);
+<a class="jxr_linenumber" name="367" href="#367">367</a>         mdia.addBox(minf);
+<a class="jxr_linenumber" name="368" href="#368">368</a> 
+<a class="jxr_linenumber" name="369" href="#369">369</a>         <strong class="jxr_keyword">return</strong> trackBox;
+<a class="jxr_linenumber" name="370" href="#370">370</a>     }
+<a class="jxr_linenumber" name="371" href="#371">371</a> 
+<a class="jxr_linenumber" name="372" href="#372">372</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">InterleaveChunkMdat</a> <strong class="jxr_keyword">implements</strong> <a href="../../../../../com/coremedia/iso/boxes/Box.html">Box</a> {
+<a class="jxr_linenumber" name="373" href="#373">373</a>         List&lt;Track&gt; tracks;
+<a class="jxr_linenumber" name="374" href="#374">374</a>         List&lt;ByteBuffer&gt; samples = <strong class="jxr_keyword">new</strong> ArrayList&lt;ByteBuffer&gt;();
+<a class="jxr_linenumber" name="375" href="#375">375</a>         <a href="../../../../../com/coremedia/iso/boxes/ContainerBox.html">ContainerBox</a> parent;
+<a class="jxr_linenumber" name="376" href="#376">376</a> 
+<a class="jxr_linenumber" name="377" href="#377">377</a>         <strong class="jxr_keyword">long</strong> contentSize = 0;
+<a class="jxr_linenumber" name="378" href="#378">378</a> 
+<a class="jxr_linenumber" name="379" href="#379">379</a>         <strong class="jxr_keyword">public</strong> <a href="../../../../../com/coremedia/iso/boxes/ContainerBox.html">ContainerBox</a> getParent() {
+<a class="jxr_linenumber" name="380" href="#380">380</a>             <strong class="jxr_keyword">return</strong> parent;
+<a class="jxr_linenumber" name="381" href="#381">381</a>         }
+<a class="jxr_linenumber" name="382" href="#382">382</a> 
+<a class="jxr_linenumber" name="383" href="#383">383</a>         <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setParent(<a href="../../../../../com/coremedia/iso/boxes/ContainerBox.html">ContainerBox</a> parent) {
+<a class="jxr_linenumber" name="384" href="#384">384</a>             <strong class="jxr_keyword">this</strong>.parent = parent;
+<a class="jxr_linenumber" name="385" href="#385">385</a>         }
+<a class="jxr_linenumber" name="386" href="#386">386</a> 
+<a class="jxr_linenumber" name="387" href="#387">387</a>         <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> parse(ReadableByteChannel readableByteChannel, ByteBuffer header, <strong class="jxr_keyword">long</strong> contentSize, <a href="../../../../../com/coremedia/iso/BoxParser.html">BoxParser</a> boxParser) <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="388" href="#388">388</a>         }
+<a class="jxr_linenumber" name="389" href="#389">389</a> 
+<a class="jxr_linenumber" name="390" href="#390">390</a>         <strong class="jxr_keyword">private</strong> <a href="../../../../../com/googlecode/mp4parser/authoring/builder/DefaultMp4Builder.html">InterleaveChunkMdat</a>(<a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="391" href="#391">391</a> 
+<a class="jxr_linenumber" name="392" href="#392">392</a>             tracks = movie.getTracks();
+<a class="jxr_linenumber" name="393" href="#393">393</a>             Map&lt;Track, <strong class="jxr_keyword">int</strong>[]&gt; chunks = <strong class="jxr_keyword">new</strong> HashMap&lt;Track, <strong class="jxr_keyword">int</strong>[]&gt;();
+<a class="jxr_linenumber" name="394" href="#394">394</a>             <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="395" href="#395">395</a>                 chunks.put(track, getChunkSizes(track, movie));
+<a class="jxr_linenumber" name="396" href="#396">396</a>             }
+<a class="jxr_linenumber" name="397" href="#397">397</a> 
+<a class="jxr_linenumber" name="398" href="#398">398</a>             <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; chunks.values().iterator().next().length; i++) {
+<a class="jxr_linenumber" name="399" href="#399">399</a>                 <strong class="jxr_keyword">for</strong> (Track track : tracks) {
+<a class="jxr_linenumber" name="400" href="#400">400</a> 
+<a class="jxr_linenumber" name="401" href="#401">401</a>                     <strong class="jxr_keyword">int</strong>[] chunkSizes = chunks.get(track);
+<a class="jxr_linenumber" name="402" href="#402">402</a>                     <strong class="jxr_keyword">long</strong> firstSampleOfChunk = 0;
+<a class="jxr_linenumber" name="403" href="#403">403</a>                     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = 0; j &lt; i; j++) {
+<a class="jxr_linenumber" name="404" href="#404">404</a>                         firstSampleOfChunk += chunkSizes[j];
+<a class="jxr_linenumber" name="405" href="#405">405</a>                     }
+<a class="jxr_linenumber" name="406" href="#406">406</a> 
+<a class="jxr_linenumber" name="407" href="#407">407</a>                     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = l2i(firstSampleOfChunk); j &lt; firstSampleOfChunk + chunkSizes[i]; j++) {
+<a class="jxr_linenumber" name="408" href="#408">408</a> 
+<a class="jxr_linenumber" name="409" href="#409">409</a>                         ByteBuffer s = DefaultMp4Builder.<strong class="jxr_keyword">this</strong>.track2Sample.get(track).get(j);
+<a class="jxr_linenumber" name="410" href="#410">410</a>                         contentSize += s.limit();
+<a class="jxr_linenumber" name="411" href="#411">411</a>                         samples.add((ByteBuffer) s.rewind());
+<a class="jxr_linenumber" name="412" href="#412">412</a>                     }
+<a class="jxr_linenumber" name="413" href="#413">413</a> 
+<a class="jxr_linenumber" name="414" href="#414">414</a>                 }
+<a class="jxr_linenumber" name="415" href="#415">415</a> 
+<a class="jxr_linenumber" name="416" href="#416">416</a>             }
+<a class="jxr_linenumber" name="417" href="#417">417</a> 
+<a class="jxr_linenumber" name="418" href="#418">418</a>         }
+<a class="jxr_linenumber" name="419" href="#419">419</a> 
+<a class="jxr_linenumber" name="420" href="#420">420</a>         <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> getDataOffset() {
+<a class="jxr_linenumber" name="421" href="#421">421</a>             <a href="../../../../../com/coremedia/iso/boxes/Box.html">Box</a> b = <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="422" href="#422">422</a>             <strong class="jxr_keyword">long</strong> offset = 16;
+<a class="jxr_linenumber" name="423" href="#423">423</a>             <strong class="jxr_keyword">while</strong> (b.getParent() != <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="424" href="#424">424</a>                 <strong class="jxr_keyword">for</strong> (Box box : b.getParent().getBoxes()) {
+<a class="jxr_linenumber" name="425" href="#425">425</a>                     <strong class="jxr_keyword">if</strong> (b == box) {
+<a class="jxr_linenumber" name="426" href="#426">426</a>                         <strong class="jxr_keyword">break</strong>;
+<a class="jxr_linenumber" name="427" href="#427">427</a>                     }
+<a class="jxr_linenumber" name="428" href="#428">428</a>                     offset += box.getSize();
+<a class="jxr_linenumber" name="429" href="#429">429</a>                 }
+<a class="jxr_linenumber" name="430" href="#430">430</a>                 b = b.getParent();
+<a class="jxr_linenumber" name="431" href="#431">431</a>             }
+<a class="jxr_linenumber" name="432" href="#432">432</a>             <strong class="jxr_keyword">return</strong> offset;
+<a class="jxr_linenumber" name="433" href="#433">433</a>         }
+<a class="jxr_linenumber" name="434" href="#434">434</a> 
+<a class="jxr_linenumber" name="435" href="#435">435</a> 
+<a class="jxr_linenumber" name="436" href="#436">436</a>         <strong class="jxr_keyword">public</strong> String getType() {
+<a class="jxr_linenumber" name="437" href="#437">437</a>             <strong class="jxr_keyword">return</strong> <span class="jxr_string">"mdat"</span>;
+<a class="jxr_linenumber" name="438" href="#438">438</a>         }
+<a class="jxr_linenumber" name="439" href="#439">439</a> 
+<a class="jxr_linenumber" name="440" href="#440">440</a>         <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> getSize() {
+<a class="jxr_linenumber" name="441" href="#441">441</a>             <strong class="jxr_keyword">return</strong> 16 + contentSize;
+<a class="jxr_linenumber" name="442" href="#442">442</a>         }
+<a class="jxr_linenumber" name="443" href="#443">443</a> 
+<a class="jxr_linenumber" name="444" href="#444">444</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> isSmallBox(<strong class="jxr_keyword">long</strong> contentSize) {
+<a class="jxr_linenumber" name="445" href="#445">445</a>             <strong class="jxr_keyword">return</strong> (contentSize + 8) &lt; 4294967296L;
+<a class="jxr_linenumber" name="446" href="#446">446</a>         }
+<a class="jxr_linenumber" name="447" href="#447">447</a> 
+<a class="jxr_linenumber" name="448" href="#448">448</a> 
+<a class="jxr_linenumber" name="449" href="#449">449</a>         <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getBox(WritableByteChannel writableByteChannel) <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="450" href="#450">450</a>             ByteBuffer bb = ByteBuffer.allocate(16);
+<a class="jxr_linenumber" name="451" href="#451">451</a>             <strong class="jxr_keyword">long</strong> size = getSize();
+<a class="jxr_linenumber" name="452" href="#452">452</a>             <strong class="jxr_keyword">if</strong> (isSmallBox(size)) {
+<a class="jxr_linenumber" name="453" href="#453">453</a>                 IsoTypeWriter.writeUInt32(bb, size);
+<a class="jxr_linenumber" name="454" href="#454">454</a>             } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="455" href="#455">455</a>                 IsoTypeWriter.writeUInt32(bb, 1);
+<a class="jxr_linenumber" name="456" href="#456">456</a>             }
+<a class="jxr_linenumber" name="457" href="#457">457</a>             bb.put(IsoFile.fourCCtoBytes(<span class="jxr_string">"mdat"</span>));
+<a class="jxr_linenumber" name="458" href="#458">458</a>             <strong class="jxr_keyword">if</strong> (isSmallBox(size)) {
+<a class="jxr_linenumber" name="459" href="#459">459</a>                 bb.put(<strong class="jxr_keyword">new</strong> byte[8]);
+<a class="jxr_linenumber" name="460" href="#460">460</a>             } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="461" href="#461">461</a>                 IsoTypeWriter.writeUInt64(bb, size);
+<a class="jxr_linenumber" name="462" href="#462">462</a>             }
+<a class="jxr_linenumber" name="463" href="#463">463</a>             bb.rewind();
+<a class="jxr_linenumber" name="464" href="#464">464</a>             writableByteChannel.write(bb);
+<a class="jxr_linenumber" name="465" href="#465">465</a>             <strong class="jxr_keyword">if</strong> (writableByteChannel instanceof GatheringByteChannel) {
+<a class="jxr_linenumber" name="466" href="#466">466</a>                 List&lt;ByteBuffer&gt; nuSamples = unifyAdjacentBuffers(samples);
+<a class="jxr_linenumber" name="467" href="#467">467</a> 
+<a class="jxr_linenumber" name="468" href="#468">468</a>                 <strong class="jxr_keyword">int</strong> STEPSIZE = 1024;
+<a class="jxr_linenumber" name="469" href="#469">469</a>                 <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; Math.ceil((<strong class="jxr_keyword">double</strong>) nuSamples.size() / STEPSIZE); i++) {
+<a class="jxr_linenumber" name="470" href="#470">470</a>                     List&lt;ByteBuffer&gt; sublist = nuSamples.subList(
+<a class="jxr_linenumber" name="471" href="#471">471</a>                             i * STEPSIZE, <em class="jxr_comment">// start</em>
+<a class="jxr_linenumber" name="472" href="#472">472</a>                             (i + 1) * STEPSIZE &lt; nuSamples.size() ? (i + 1) * STEPSIZE : nuSamples.size()); <em class="jxr_comment">// end</em>
+<a class="jxr_linenumber" name="473" href="#473">473</a>                     ByteBuffer sampleArray[] = sublist.toArray(<strong class="jxr_keyword">new</strong> ByteBuffer[sublist.size()]);
+<a class="jxr_linenumber" name="474" href="#474">474</a>                     <strong class="jxr_keyword">do</strong> {
+<a class="jxr_linenumber" name="475" href="#475">475</a>                         ((GatheringByteChannel) writableByteChannel).write(sampleArray);
+<a class="jxr_linenumber" name="476" href="#476">476</a>                     } <strong class="jxr_keyword">while</strong> (sampleArray[sampleArray.length - 1].remaining() &gt; 0);
+<a class="jxr_linenumber" name="477" href="#477">477</a>                 }
+<a class="jxr_linenumber" name="478" href="#478">478</a>                 <em class="jxr_comment">//System.err.println(bytesWritten);</em>
+<a class="jxr_linenumber" name="479" href="#479">479</a>             } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="480" href="#480">480</a>                 <strong class="jxr_keyword">for</strong> (ByteBuffer sample : samples) {
+<a class="jxr_linenumber" name="481" href="#481">481</a>                     sample.rewind();
+<a class="jxr_linenumber" name="482" href="#482">482</a>                     writableByteChannel.write(sample);
+<a class="jxr_linenumber" name="483" href="#483">483</a>                 }
+<a class="jxr_linenumber" name="484" href="#484">484</a>             }
+<a class="jxr_linenumber" name="485" href="#485">485</a>         }
+<a class="jxr_linenumber" name="486" href="#486">486</a> 
+<a class="jxr_linenumber" name="487" href="#487">487</a>     }
+<a class="jxr_linenumber" name="488" href="#488">488</a> 
+<a class="jxr_linenumber" name="489" href="#489">489</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="490" href="#490">490</a> <em class="jxr_javadoccomment">     * Gets the chunk sizes for the given track.</em>
+<a class="jxr_linenumber" name="491" href="#491">491</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="492" href="#492">492</a> <em class="jxr_javadoccomment">     * @param track</em>
+<a class="jxr_linenumber" name="493" href="#493">493</a> <em class="jxr_javadoccomment">     * @param movie</em>
+<a class="jxr_linenumber" name="494" href="#494">494</a> <em class="jxr_javadoccomment">     * @return</em>
+<a class="jxr_linenumber" name="495" href="#495">495</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="496" href="#496">496</a>     <strong class="jxr_keyword">int</strong>[] getChunkSizes(<a href="../../../../../com/googlecode/mp4parser/authoring/Track.html">Track</a> track, <a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="497" href="#497">497</a> 
+<a class="jxr_linenumber" name="498" href="#498">498</a>         <strong class="jxr_keyword">long</strong>[] referenceChunkStarts = intersectionFinder.sampleNumbers(track, movie);
+<a class="jxr_linenumber" name="499" href="#499">499</a>         <strong class="jxr_keyword">int</strong>[] chunkSizes = <strong class="jxr_keyword">new</strong> <strong class="jxr_keyword">int</strong>[referenceChunkStarts.length];
+<a class="jxr_linenumber" name="500" href="#500">500</a> 
+<a class="jxr_linenumber" name="501" href="#501">501</a> 
+<a class="jxr_linenumber" name="502" href="#502">502</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; referenceChunkStarts.length; i++) {
+<a class="jxr_linenumber" name="503" href="#503">503</a>             <strong class="jxr_keyword">long</strong> start = referenceChunkStarts[i] - 1;
+<a class="jxr_linenumber" name="504" href="#504">504</a>             <strong class="jxr_keyword">long</strong> end;
+<a class="jxr_linenumber" name="505" href="#505">505</a>             <strong class="jxr_keyword">if</strong> (referenceChunkStarts.length == i + 1) {
+<a class="jxr_linenumber" name="506" href="#506">506</a>                 end = track.getSamples().size();
+<a class="jxr_linenumber" name="507" href="#507">507</a>             } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="508" href="#508">508</a>                 end = referenceChunkStarts[i + 1] - 1;
+<a class="jxr_linenumber" name="509" href="#509">509</a>             }
+<a class="jxr_linenumber" name="510" href="#510">510</a> 
+<a class="jxr_linenumber" name="511" href="#511">511</a>             chunkSizes[i] = l2i(end - start);
+<a class="jxr_linenumber" name="512" href="#512">512</a>             <em class="jxr_comment">// The Stretch makes sure that there are as much audio and video chunks!</em>
+<a class="jxr_linenumber" name="513" href="#513">513</a>         }
+<a class="jxr_linenumber" name="514" href="#514">514</a>         assert DefaultMp4Builder.<strong class="jxr_keyword">this</strong>.track2Sample.get(track).size() == sum(chunkSizes) : <span class="jxr_string">"The number of samples and the sum of all chunk lengths must be equal"</span>;
+<a class="jxr_linenumber" name="515" href="#515">515</a>         <strong class="jxr_keyword">return</strong> chunkSizes;
+<a class="jxr_linenumber" name="516" href="#516">516</a> 
+<a class="jxr_linenumber" name="517" href="#517">517</a> 
+<a class="jxr_linenumber" name="518" href="#518">518</a>     }
+<a class="jxr_linenumber" name="519" href="#519">519</a> 
+<a class="jxr_linenumber" name="520" href="#520">520</a> 
+<a class="jxr_linenumber" name="521" href="#521">521</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> sum(<strong class="jxr_keyword">int</strong>[] ls) {
+<a class="jxr_linenumber" name="522" href="#522">522</a>         <strong class="jxr_keyword">long</strong> rc = 0;
+<a class="jxr_linenumber" name="523" href="#523">523</a>         <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">long</strong> l : ls) {
+<a class="jxr_linenumber" name="524" href="#524">524</a>             rc += l;
+<a class="jxr_linenumber" name="525" href="#525">525</a>         }
+<a class="jxr_linenumber" name="526" href="#526">526</a>         <strong class="jxr_keyword">return</strong> rc;
+<a class="jxr_linenumber" name="527" href="#527">527</a>     }
+<a class="jxr_linenumber" name="528" href="#528">528</a> 
+<a class="jxr_linenumber" name="529" href="#529">529</a>     <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> getDuration(<a href="../../../../../com/googlecode/mp4parser/authoring/Track.html">Track</a> track) {
+<a class="jxr_linenumber" name="530" href="#530">530</a>         <strong class="jxr_keyword">long</strong> duration = 0;
+<a class="jxr_linenumber" name="531" href="#531">531</a>         <strong class="jxr_keyword">for</strong> (TimeToSampleBox.Entry entry : track.getDecodingTimeEntries()) {
+<a class="jxr_linenumber" name="532" href="#532">532</a>             duration += entry.getCount() * entry.getDelta();
+<a class="jxr_linenumber" name="533" href="#533">533</a>         }
+<a class="jxr_linenumber" name="534" href="#534">534</a>         <strong class="jxr_keyword">return</strong> duration;
+<a class="jxr_linenumber" name="535" href="#535">535</a>     }
+<a class="jxr_linenumber" name="536" href="#536">536</a> 
+<a class="jxr_linenumber" name="537" href="#537">537</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> getTimescale(<a href="../../../../../com/googlecode/mp4parser/authoring/Movie.html">Movie</a> movie) {
+<a class="jxr_linenumber" name="538" href="#538">538</a>         <strong class="jxr_keyword">long</strong> timescale = movie.getTracks().iterator().next().getTrackMetaData().getTimescale();
+<a class="jxr_linenumber" name="539" href="#539">539</a>         <strong class="jxr_keyword">for</strong> (Track track : movie.getTracks()) {
+<a class="jxr_linenumber" name="540" href="#540">540</a>             timescale = gcd(track.getTrackMetaData().getTimescale(), timescale);
+<a class="jxr_linenumber" name="541" href="#541">541</a>         }
+<a class="jxr_linenumber" name="542" href="#542">542</a>         <strong class="jxr_keyword">return</strong> timescale;
+<a class="jxr_linenumber" name="543" href="#543">543</a>     }
+<a class="jxr_linenumber" name="544" href="#544">544</a> 
+<a class="jxr_linenumber" name="545" href="#545">545</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> gcd(<strong class="jxr_keyword">long</strong> a, <strong class="jxr_keyword">long</strong> b) {
+<a class="jxr_linenumber" name="546" href="#546">546</a>         <strong class="jxr_keyword">if</strong> (b == 0) {
+<a class="jxr_linenumber" name="547" href="#547">547</a>             <strong class="jxr_keyword">return</strong> a;
+<a class="jxr_linenumber" name="548" href="#548">548</a>         }
+<a class="jxr_linenumber" name="549" href="#549">549</a>         <strong class="jxr_keyword">return</strong> gcd(b, a % b);
+<a class="jxr_linenumber" name="550" href="#550">550</a>     }
+<a class="jxr_linenumber" name="551" href="#551">551</a> 
+<a class="jxr_linenumber" name="552" href="#552">552</a>     <strong class="jxr_keyword">public</strong> List&lt;ByteBuffer&gt; unifyAdjacentBuffers(List&lt;ByteBuffer&gt; samples) {
+<a class="jxr_linenumber" name="553" href="#553">553</a>         ArrayList&lt;ByteBuffer&gt; nuSamples = <strong class="jxr_keyword">new</strong> ArrayList&lt;ByteBuffer&gt;(samples.size());
+<a class="jxr_linenumber" name="554" href="#554">554</a>         <strong class="jxr_keyword">for</strong> (ByteBuffer buffer : samples) {
+<a class="jxr_linenumber" name="555" href="#555">555</a>             <strong class="jxr_keyword">int</strong> lastIndex = nuSamples.size() - 1;
+<a class="jxr_linenumber" name="556" href="#556">556</a>             <strong class="jxr_keyword">if</strong> (lastIndex &gt;= 0 &amp;&amp; buffer.hasArray() &amp;&amp; nuSamples.get(lastIndex).hasArray() &amp;&amp; buffer.array() == nuSamples.get(lastIndex).array() &amp;&amp;
+<a class="jxr_linenumber" name="557" href="#557">557</a>                     nuSamples.get(lastIndex).arrayOffset() + nuSamples.get(lastIndex).limit() == buffer.arrayOffset()) {
+<a class="jxr_linenumber" name="558" href="#558">558</a>                 ByteBuffer oldBuffer = nuSamples.remove(lastIndex);
+<a class="jxr_linenumber" name="559" href="#559">559</a>                 ByteBuffer nu = ByteBuffer.wrap(buffer.array(), oldBuffer.arrayOffset(), oldBuffer.limit() + buffer.limit()).slice();
+<a class="jxr_linenumber" name="560" href="#560">560</a>                 <em class="jxr_comment">// We need to slice here since wrap([], offset, length) just sets position and not the arrayOffset.</em>
+<a class="jxr_linenumber" name="561" href="#561">561</a>                 nuSamples.add(nu);
+<a class="jxr_linenumber" name="562" href="#562">562</a>             } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (lastIndex &gt;= 0 &amp;&amp;
+<a class="jxr_linenumber" name="563" href="#563">563</a>                     buffer instanceof MappedByteBuffer &amp;&amp; nuSamples.get(lastIndex) instanceof MappedByteBuffer &amp;&amp;
+<a class="jxr_linenumber" name="564" href="#564">564</a>                     nuSamples.get(lastIndex).limit() == nuSamples.get(lastIndex).capacity() - buffer.capacity()) {
+<a class="jxr_linenumber" name="565" href="#565">565</a>                 <em class="jxr_comment">// This can go wrong - but will it?</em>
+<a class="jxr_linenumber" name="566" href="#566">566</a>                 ByteBuffer oldBuffer = nuSamples.get(lastIndex);
+<a class="jxr_linenumber" name="567" href="#567">567</a>                 oldBuffer.limit(buffer.limit() + oldBuffer.limit());
+<a class="jxr_linenumber" name="568" href="#568">568</a>             } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="569" href="#569">569</a>                 nuSamples.add(buffer);
+<a class="jxr_linenumber" name="570" href="#570">570</a>             }
+<a class="jxr_linenumber" name="571" href="#571">571</a>         }
+<a class="jxr_linenumber" name="572" href="#572">572</a>         <strong class="jxr_keyword">return</strong> nuSamples;
+<a class="jxr_linenumber" name="573" href="#573">573</a>     }
+<a class="jxr_linenumber" name="574" href="#574">574</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>
+

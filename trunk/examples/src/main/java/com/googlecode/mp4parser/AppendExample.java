@@ -19,11 +19,17 @@ import java.util.List;
  */
 public class AppendExample {
     public static void main(String[] args) throws IOException {
-        String audioDeutsch = AppendExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/count-deutsch-audio.mp4";
-        String audioEnglish = AppendExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/count-english-audio.mp4";
 
-        Movie[] inMovies = new Movie[]{MovieCreator.build(new FileInputStream(audioDeutsch).getChannel()),
-                MovieCreator.build(new FileInputStream(audioEnglish).getChannel())};
+
+
+        String f1 = AppendExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/1365070268951.mp4";
+        String f2 = AppendExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/1365070285923.mp4";
+        String f3 = AppendExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/1365070453555.mp4";
+
+        Movie[] inMovies = new Movie[]{
+                MovieCreator.build(new FileInputStream(f1).getChannel()),
+                MovieCreator.build(new FileInputStream(f2).getChannel()),
+                MovieCreator.build(new FileInputStream(f3).getChannel())};
 
         List<Track> videoTracks = new LinkedList<Track>();
         List<Track> audioTracks = new LinkedList<Track>();

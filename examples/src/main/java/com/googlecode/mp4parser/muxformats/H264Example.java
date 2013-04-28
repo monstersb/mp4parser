@@ -6,7 +6,10 @@ import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
 import com.googlecode.mp4parser.authoring.tracks.H264TrackImpl;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +20,7 @@ import java.io.*;
  */
 public class H264Example {
     public static void main(String[] args) throws IOException {
-        H264TrackImpl h264Track = new H264TrackImpl(new BufferedInputStream(new FileInputStream("/home/sannies2/Downloads/lv.h264")));
+        H264TrackImpl h264Track = new H264TrackImpl(new FileInputStream("/home/sannies2/Downloads/lv.h264").getChannel());
         AACTrackImpl aacTrack = new AACTrackImpl(new FileInputStream("/home/sannies2/Downloads/lv.aac").getChannel());
         Movie m = new Movie();
         m.addTrack(h264Track);

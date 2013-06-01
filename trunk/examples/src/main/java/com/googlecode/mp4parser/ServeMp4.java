@@ -1,6 +1,6 @@
 package com.googlecode.mp4parser;
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.coremedia.iso.boxes.TimeToSampleBox;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,9 +106,11 @@ public class ServeMp4 extends AbstractHandler {
             movie.addTrack(new CroppedTrack(track, startSample, endSample));
         }
 
-        IsoFile out = new DefaultMp4Builder().build(movie);
+        Container out = new DefaultMp4Builder().build(movie);
         response.setHeader("content-type", "video/mp4");
-        out.getBox(Channels.newChannel(response.getOutputStream()));
+        WritableByteChannel reponse = Channels.newChannel(response.getOutputStream());
+        out.writeContainer(reponse);
+        reponse.close();
 
 
     }

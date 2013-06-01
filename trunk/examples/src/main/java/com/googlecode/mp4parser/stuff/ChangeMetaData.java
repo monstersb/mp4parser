@@ -1,7 +1,12 @@
 package com.googlecode.mp4parser.stuff;
 
 import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.boxes.*;
+import com.coremedia.iso.boxes.Box;
+import com.coremedia.iso.boxes.ChunkOffsetBox;
+import com.coremedia.iso.boxes.MetaBox;
+import com.coremedia.iso.boxes.StaticChunkOffsetBox;
+import com.coremedia.iso.boxes.UserDataBox;
+import com.coremedia.iso.boxes.XmlBox;
 import com.googlecode.mp4parser.util.Path;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -84,7 +89,7 @@ public class ChangeMetaData {
 
             XmlBox xmlBox = new XmlBox();
             xmlBox.setXml(text);
-            metaBox.addBox(xmlBox);
+            // metaBox.addBox(xmlBox);
 
             long sizeAfter = userDataBox.getSize();
             if (needsOffsetCorrection(tempIsoFile)) {

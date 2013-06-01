@@ -1,7 +1,6 @@
 package com.googlecode.mp4parser.stuff;
 
-import com.coremedia.iso.IsoFile;
-import com.googlecode.mp4parser.AppendExample;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -10,7 +9,6 @@ import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,9 +25,9 @@ public class DavidAppend {
     public static void main(String[] args) throws IOException {
 
         List<Movie> movies = new LinkedList<Movie>();
-        movies.add(MovieCreator.build(Channels.newChannel(AppendExample.class.getResourceAsStream("/davidappend/v1.mp4"))));
-        movies.add(MovieCreator.build(Channels.newChannel(AppendExample.class.getResourceAsStream("/davidappend/v2.mp4"))));
-        movies.add(MovieCreator.build(Channels.newChannel(AppendExample.class.getResourceAsStream("/davidappend/v2.mp4"))));
+        movies.add(MovieCreator.build(DavidAppend.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/davidappend/v1.mp4"));
+        movies.add(MovieCreator.build(DavidAppend.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/davidappend/v2.mp4"));
+        movies.add(MovieCreator.build(DavidAppend.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/davidappend/v2.mp4"));
 
 
         List<Track> videoTracks = new LinkedList<Track>();
@@ -53,14 +51,11 @@ public class DavidAppend {
         concatMovie.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
 
 
-        IsoFile out2 = new DefaultMp4Builder().build(concatMovie);
-
-        {
-            FileChannel fc = new RandomAccessFile(String.format("output.mp4"), "rw").getChannel();
-            fc.position(0);
-            out2.getBox(fc);
-            fc.close();
-        }
+        Container out2 = new DefaultMp4Builder().build(concatMovie);
+        FileChannel fc = new RandomAccessFile(String.format("output.mp4"), "rw").getChannel();
+        fc.position(0);
+        out2.writeContainer(fc);
+        fc.close();
 
 
     }

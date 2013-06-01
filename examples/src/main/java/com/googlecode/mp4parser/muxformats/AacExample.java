@@ -1,6 +1,6 @@
 package com.googlecode.mp4parser.muxformats;
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
@@ -8,6 +8,7 @@ import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,9 +24,11 @@ public class AacExample {
         Movie m = new Movie();
         m.addTrack(aacTrack);
         DefaultMp4Builder mp4Builder = new DefaultMp4Builder();
-        IsoFile isoFile = mp4Builder.build(m);
+        Container out = mp4Builder.build(m);
         FileOutputStream fos = new FileOutputStream("output.mp4");
-        isoFile.getBox(fos.getChannel());
+        FileChannel fc = fos.getChannel();
+        out.writeContainer(fc);
+
         fos.close();
     }
 }

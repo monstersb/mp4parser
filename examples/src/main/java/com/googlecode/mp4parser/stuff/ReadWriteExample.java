@@ -1,15 +1,13 @@
 package com.googlecode.mp4parser.stuff;
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
-import com.googlecode.mp4parser.authoring.builder.FragmentedMp4Builder;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 
 /**
@@ -25,7 +23,7 @@ public class ReadWriteExample {
         Movie video = MovieCreator.build(new FileInputStream("/home/sannies/scm/svn/mp4parser/Solekai022_854_29_640x75_MaxSdSubtitle.uvu").getChannel());
 
         //IsoFile out1 = new FragmentedMp4Builder().build(video);
-        IsoFile out2 = new DefaultMp4Builder().build(video);
+        Container out2 = new DefaultMp4Builder().build(video);
 
 
        /* long starttime1 = System.currentTimeMillis();
@@ -39,8 +37,7 @@ public class ReadWriteExample {
 
         long starttime2 = System.currentTimeMillis();
         FileChannel fc2 = new RandomAccessFile("output_uvu.mp4", "rw").getChannel();
-        fc2.position(0);
-        out2.getBox(fc2);
+        out2.writeContainer(fc2);
         long size2 = fc2.size();
         fc2.truncate(fc2.position());
         fc2.close();

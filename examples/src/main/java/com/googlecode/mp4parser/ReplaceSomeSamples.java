@@ -1,6 +1,6 @@
 package com.googlecode.mp4parser;
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Replaces some samples.
@@ -32,9 +33,10 @@ public class ReplaceSomeSamples {
                                 25, ByteBuffer.allocate(5)),
                         27, ByteBuffer.allocate(5)),
                 29, ByteBuffer.allocate(5)));
-        IsoFile out = new DefaultMp4Builder().build(nuMovie);
+        Container out = new DefaultMp4Builder().build(nuMovie);
         FileOutputStream fos = new FileOutputStream(new File("output.mp4"));
-        out.getBox(fos.getChannel());
+        FileChannel fc = fos.getChannel();
+        out.writeContainer(fc);
         fos.close();
     }
 

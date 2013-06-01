@@ -2,6 +2,7 @@ package com.googlecode.mp4parser;
 
 import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.IsoTypeReaderVariable;
+import com.coremedia.iso.boxes.Container;
 import com.coremedia.iso.boxes.TrackBox;
 import com.coremedia.iso.boxes.h264.AvcConfigurationBox;
 import com.coremedia.iso.boxes.mdat.SampleList;
@@ -25,9 +26,9 @@ public class ExtractRawH264 {
         m.addTrack(h264Track);
 
 
-        IsoFile out = new DefaultMp4Builder().build(m);
+        Container out = new DefaultMp4Builder().build(m);
         FileOutputStream fos = new FileOutputStream(new File("output.mp4"));
-        out.getBox(fos.getChannel());
+        out.writeContainer(fos.getChannel());
         fos.close();
         // Up until here we mux a raw h264 file into mp4 and in the next step we regenerate the raw file.
 

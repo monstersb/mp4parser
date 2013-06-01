@@ -11,14 +11,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.util.Iterator;
 import java.util.Properties;
 
 
 public class DumpAmf0TrackToPropertyFile {
     public static void main(String[] args) throws IOException {
-        Movie movie = MovieCreator.build(Channels.newChannel(DumpAmf0TrackToPropertyFile.class.getResourceAsStream("/example.f4v")));
+        Movie movie = MovieCreator.build(DumpAmf0TrackToPropertyFile.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/example.f4v");
 
 
         for (Track track : movie.getTracks()) {

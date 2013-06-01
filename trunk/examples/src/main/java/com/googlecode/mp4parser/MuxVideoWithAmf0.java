@@ -1,6 +1,6 @@
 package com.googlecode.mp4parser;
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.FragmentedMp4Builder;
@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -38,10 +39,12 @@ public class MuxVideoWithAmf0 {
         FragmentedMp4Builder fragmentedMp4Builder = new FragmentedMp4Builder();
         fragmentedMp4Builder.setIntersectionFinder(new TwoSecondIntersectionFinder());
 
-        IsoFile out = fragmentedMp4Builder.build(video);
+        Container out = fragmentedMp4Builder.build(video);
         FileOutputStream fos = new FileOutputStream(new File(String.format("output.mp4")));
 
-        out.getBox(fos.getChannel());
+        FileChannel fc = fos.getChannel();
+        out.writeContainer(fc);
+
         fos.close();
 
     }

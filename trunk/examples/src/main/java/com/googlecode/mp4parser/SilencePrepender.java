@@ -1,7 +1,7 @@
 package com.googlecode.mp4parser;
 
 
-import com.coremedia.iso.IsoFile;
+import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -27,11 +27,11 @@ public class SilencePrepender {
 
         result.addTrack(new AppendTrack(silence, audio));
 
-        IsoFile isoFile = new DefaultMp4Builder().build(result);
+        Container isoFile = new DefaultMp4Builder().build(result);
 
         FileChannel fc = new RandomAccessFile(String.format("output.mp4"), "rw").getChannel();
         fc.position(0);
-        isoFile.getBox(fc);
+        isoFile.writeContainer(fc);
         fc.close();
 
     }

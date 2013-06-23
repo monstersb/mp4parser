@@ -26,7 +26,7 @@ public class ChangeMetaData {
 
     public static void main(String[] args) throws IOException {
         ChangeMetaData cmd = new ChangeMetaData();
-        cmd.writeRandomMetadata("/home/sannies2/aaa.mp4", "lore ipsum tralalala");
+        cmd.writeRandomMetadata("D:\\downloads\\Rectify.S01E01.HDTV.x264-2HD.mp4", "lore ipsum tralalala");
     }
 
 
@@ -89,13 +89,14 @@ public class ChangeMetaData {
 
             XmlBox xmlBox = new XmlBox();
             xmlBox.setXml(text);
-            // metaBox.addBox(xmlBox);
+            metaBox.addBox(xmlBox);
 
             long sizeAfter = userDataBox.getSize();
             if (needsOffsetCorrection(tempIsoFile)) {
                 correctChunkOffsets(tempIsoFile, sizeAfter - sizeBefore);
             }
-            videoFileOutputStream = new FileOutputStream(videoFile);
+            tempIsoFile.getMovieBox().addBox(userDataBox);
+            videoFileOutputStream = new FileOutputStream(videoFilePath + "_mod.mp4");
             tempIsoFile.getBox(videoFileOutputStream.getChannel());
         } finally {
             IOUtils.closeQuietly(tempIsoFile);

@@ -8,6 +8,7 @@ import com.coremedia.iso.boxes.h264.AvcConfigurationBox;
 import com.coremedia.iso.boxes.mdat.SampleList;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 import com.googlecode.mp4parser.authoring.tracks.H264TrackImpl;
 import com.googlecode.mp4parser.util.Path;
 
@@ -21,18 +22,7 @@ import java.nio.channels.FileChannel;
 
 public class ExtractRawH264 {
     public static void main(String[] args) throws IOException {
-        H264TrackImpl h264Track = new H264TrackImpl(new FileInputStream("C:\\dev\\mp4parser\\isoparser\\src\\test\\resources\\count.h264").getChannel());
-        Movie m = new Movie();
-        m.addTrack(h264Track);
-
-
-        Container out = new DefaultMp4Builder().build(m);
-        FileOutputStream fos = new FileOutputStream(new File("output.mp4"));
-        out.writeContainer(fos.getChannel());
-        fos.close();
-        // Up until here we mux a raw h264 file into mp4 and in the next step we regenerate the raw file.
-
-        IsoFile isoFile = new IsoFile("output.mp4");
+        IsoFile isoFile = new IsoFile(new FileInputStream("D:\\downloads\\cracked.s01e01.hdtv.x264-2hd.mp4").getChannel());
         TrackBox trackBox = (TrackBox) Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/../../../../../");
         SampleList sl = new SampleList(trackBox);
 

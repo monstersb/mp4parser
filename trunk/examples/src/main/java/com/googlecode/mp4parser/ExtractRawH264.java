@@ -7,6 +7,7 @@ import com.coremedia.iso.boxes.TrackBox;
 import com.coremedia.iso.boxes.h264.AvcConfigurationBox;
 import com.coremedia.iso.boxes.mdat.SampleList;
 import com.googlecode.mp4parser.authoring.Movie;
+import com.googlecode.mp4parser.authoring.Sample;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 import com.googlecode.mp4parser.authoring.tracks.H264TrackImpl;
@@ -47,12 +48,13 @@ public class ExtractRawH264 {
         // There might be more than one PPS (I've never seen that but it is possible)
 
         int lengthSize = ((AvcConfigurationBox) Path.getPath(trackBox, "mdia/minf/stbl/stsd/avc1/avcC")).getLengthSizeMinusOne() + 1;
-        for (ByteBuffer sample : sl) {
+        for (Sample sample : sl) {
             while (sample.remaining() > 0) {
-                int length = (int) IsoTypeReaderVariable.read(sample, lengthSize);
+                ByteBuffer bb = sample.asByteBuffer();
+                int length = (int) IsoTypeReaderVariable.read(bb, lengthSize);
                 fc.write((ByteBuffer) separator.rewind());
-                fc.write((ByteBuffer) sample.slice().limit(length));
-                sample.position(sample.position() + length);
+                fc.write((ByteBuffer) bb.slice().limit(length));
+                bb.position(bb.position() + length);
             }
 
 

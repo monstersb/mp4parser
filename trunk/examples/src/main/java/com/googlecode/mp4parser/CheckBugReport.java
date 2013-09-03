@@ -25,10 +25,10 @@ public class CheckBugReport {
 
     public void buildMP4(String inputMP4File, String h264File, String outputMP4file, ArrayList<Long> timeStamps) throws IOException {
 
-        Movie movie = MovieCreator.build(new FileInputStream(inputMP4File).getChannel());
+        Movie movie = MovieCreator.build(inputMP4File);
         Track audioTrack = movie.getTrackByTrackId(2);
 
-        H264TrackImpl h264Track = new H264TrackImpl(new FileInputStream(h264File).getChannel());
+        H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(h264File));
 
         List<TimeToSampleBox.Entry> ttsbEntries = h264Track.getDecodingTimeEntries();
         ttsbEntries.clear();

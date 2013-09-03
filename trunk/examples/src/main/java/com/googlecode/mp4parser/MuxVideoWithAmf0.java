@@ -24,7 +24,7 @@ public class MuxVideoWithAmf0 {
     public static void main(String[] args) throws IOException {
         String videoFile = MuxVideoWithAmf0.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/example-sans-amf0.mp4";
 
-        Movie video = MovieCreator.build(new FileInputStream(videoFile).getChannel());
+        Movie video = MovieCreator.build(videoFile);
 
         Properties props = new Properties();
         props.load(MuxVideoWithAmf0.class.getResourceAsStream("/amf0track.properties"));

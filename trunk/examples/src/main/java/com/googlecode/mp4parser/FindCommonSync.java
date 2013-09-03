@@ -21,7 +21,7 @@ public class FindCommonSync {
         HashMap<Integer, Integer> common = new HashMap<Integer, Integer>();
         boolean first = true;
         for (String arg : args) {
-            Movie invideo = MovieCreator.build(new FileInputStream(arg).getChannel());
+            Movie invideo = MovieCreator.build(arg);
             List<Track> tracks = invideo.getTracks();
 
             for (Track t : tracks) {

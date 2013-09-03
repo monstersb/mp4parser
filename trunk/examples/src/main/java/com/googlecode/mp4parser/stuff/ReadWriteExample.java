@@ -20,7 +20,7 @@ public class ReadWriteExample {
 
 
         //Movie video = mc.build(Channels.newChannel(ReadWriteExample.class.getResourceAsStream("/smoothstreaming/video-128h-75kbps.mp4")));
-        Movie video = MovieCreator.build(new FileInputStream("/home/sannies/scm/svn/mp4parser/Solekai022_854_29_640x75_MaxSdSubtitle.uvu").getChannel());
+        Movie video = MovieCreator.build("/home/sannies/scm/svn/mp4parser/Solekai022_854_29_640x75_MaxSdSubtitle.uvu");
 
         //IsoFile out1 = new FragmentedMp4Builder().build(video);
         Container out2 = new DefaultMp4Builder().build(video);

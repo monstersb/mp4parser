@@ -19,7 +19,7 @@ import java.io.IOException;
 public class RemoveSomeSamplesExample {
     public static void main(String[] args) throws IOException {
         String audioEnglish = RemoveSomeSamplesExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/count-english-audio.mp4";
-        Movie originalMovie = MovieCreator.build(new FileInputStream(audioEnglish).getChannel());
+        Movie originalMovie = MovieCreator.build(audioEnglish);
 
         Track audio = originalMovie.getTracks().get(0);
 

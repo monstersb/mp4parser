@@ -1,6 +1,7 @@
 package com.googlecode.mp4parser.muxformats;
 
 import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.H264TrackImpl;
@@ -20,7 +21,7 @@ import java.nio.channels.FileChannel;
  */
 public class H264Example {
     public static void main(String[] args) throws IOException {
-        H264TrackImpl h264Track = new H264TrackImpl(new FileInputStream("C:\\dev\\mp4parser2\\out.h264").getChannel());
+        H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl("C:\\dev\\mp4parser2\\out.h264"));
         //AACTrackImpl aacTrack = new AACTrackImpl(new FileInputStream("/home/sannies2/Downloads/lv.aac").getChannel());
         Movie m = new Movie();
         m.addTrack(h264Track);

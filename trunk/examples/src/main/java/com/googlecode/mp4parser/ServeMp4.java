@@ -35,7 +35,7 @@ public class ServeMp4 extends AbstractHandler {
     Movie movie;
 
     public static void main(String[] args) throws Exception {
-        Movie movie = MovieCreator.build(new FileInputStream(new File("/home/sannies/CSI.S13E02.HDTV.x264-LOL.mp4")).getChannel());
+        Movie movie = MovieCreator.build("/home/sannies/CSI.S13E02.HDTV.x264-LOL.mp4");
 
 
         Server server = new Server(8080);

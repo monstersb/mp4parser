@@ -17,7 +17,7 @@ import java.nio.channels.FileChannel;
 public class SilencePrepender {
     public static void main(String[] args) throws IOException {
 
-        Movie audioMovie = MovieCreator.build(new FileInputStream("/home/sannies/scm/svn/mp4parser/silence/sample.mp4").getChannel());
+        Movie audioMovie = MovieCreator.build("/home/sannies/scm/svn/mp4parser/silence/sample.mp4");
 
 
         Movie result = new Movie();

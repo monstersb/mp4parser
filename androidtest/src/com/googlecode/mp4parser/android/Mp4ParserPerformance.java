@@ -17,7 +17,7 @@ import com.googlecode.mp4parser.authoring.tracks.CroppedTrack;
 import com.googlecode.mp4parser.util.Path;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
+import com.googlecode.mp4parser.FileChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

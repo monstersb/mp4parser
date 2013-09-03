@@ -19,7 +19,7 @@ import java.nio.channels.FileChannel;
 public class SubTitleExample {
     public static void main(String[] args) throws IOException {
         String audioEnglish = RemoveSomeSamplesExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/count-video.mp4";
-        Movie countVideo = MovieCreator.build(new FileInputStream(audioEnglish).getChannel());
+        Movie countVideo = MovieCreator.build(audioEnglish);
 
 
         TextTrackImpl subTitleEng = new TextTrackImpl();

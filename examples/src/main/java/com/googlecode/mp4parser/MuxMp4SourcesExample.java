@@ -24,9 +24,9 @@ public class MuxMp4SourcesExample {
         String video = MuxMp4SourcesExample.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "/count-video.mp4";
 
 
-        Movie countVideo = MovieCreator.build(new FileInputStream(video).getChannel());
-        Movie countAudioDeutsch = MovieCreator.build(new FileInputStream(audioDeutsch).getChannel());
-        Movie countAudioEnglish = MovieCreator.build(new FileInputStream(audioEnglish).getChannel());
+        Movie countVideo = MovieCreator.build(video);
+        Movie countAudioDeutsch = MovieCreator.build(audioDeutsch);
+        Movie countAudioEnglish = MovieCreator.build(audioEnglish);
 
         Track audioTrackDeutsch = countAudioDeutsch.getTracks().get(0);
         audioTrackDeutsch.getTrackMetaData().setLanguage("deu");

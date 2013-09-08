@@ -1,6 +1,7 @@
 package com.googlecode.mp4parser.muxformats;
 
 import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
@@ -20,7 +21,7 @@ import java.nio.channels.FileChannel;
 public class AacExample {
     public static void main(String[] args) throws IOException {
 //        AACTrackImpl aacTrack = new AACTrackImpl(Ac3Example.class.getResourceAsStream("/sample.aac"));
-        AACTrackImpl aacTrack = new AACTrackImpl(new FileInputStream("/Users/magnus/Projects/castlabs/cff/Solekai015_1920_29_75x75_v2/Solekai_BeautifulTension_15sec_160k.aac").getChannel());
+        AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl("/Users/magnus/Projects/castlabs/cff/Solekai015_1920_29_75x75_v2/Solekai_BeautifulTension_15sec_160k.aac"));
         Movie m = new Movie();
         m.addTrack(aacTrack);
         DefaultMp4Builder mp4Builder = new DefaultMp4Builder();

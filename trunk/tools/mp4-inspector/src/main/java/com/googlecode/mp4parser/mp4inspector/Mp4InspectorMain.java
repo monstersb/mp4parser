@@ -1,7 +1,5 @@
 package com.googlecode.mp4parser.mp4inspector;
 
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.boxes.Box;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;

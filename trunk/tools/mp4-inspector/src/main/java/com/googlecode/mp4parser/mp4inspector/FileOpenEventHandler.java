@@ -1,16 +1,12 @@
 package com.googlecode.mp4parser.mp4inspector;
 
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.boxes.Box;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FileOpenEventHandler implements EventHandler<ActionEvent> {

@@ -24,6 +24,7 @@ import java.nio.channels.FileChannel;
 public class ExtractRawH264 {
     public static void main(String[] args) throws IOException {
         IsoFile isoFile = new IsoFile("D:\\downloads\\cracked.s01e01.hdtv.x264-2hd.mp4");
+
         TrackBox trackBox = (TrackBox) Path.getPath(isoFile, "/moov/trak/mdia/minf/stbl/stsd/avc1/../../../../../");
         SampleList sl = new SampleList(trackBox);
 

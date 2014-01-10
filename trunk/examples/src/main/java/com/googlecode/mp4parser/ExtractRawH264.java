@@ -50,8 +50,8 @@ public class ExtractRawH264 {
 
         int lengthSize = ((AvcConfigurationBox) Path.getPath(trackBox, "mdia/minf/stbl/stsd/avc1/avcC")).getLengthSizeMinusOne() + 1;
         for (Sample sample : sl) {
-            while (sample.remaining() > 0) {
-                ByteBuffer bb = sample.asByteBuffer();
+            ByteBuffer bb = sample.asByteBuffer();
+            while (bb.remaining() > 0) {
                 int length = (int) IsoTypeReaderVariable.read(bb, lengthSize);
                 fc.write((ByteBuffer) separator.rewind());
                 fc.write((ByteBuffer) bb.slice().limit(length));

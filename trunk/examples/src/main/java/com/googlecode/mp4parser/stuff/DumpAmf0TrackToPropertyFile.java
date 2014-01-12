@@ -27,15 +27,13 @@ public class DumpAmf0TrackToPropertyFile {
                 Iterator<Sample> samples = track.getSamples().iterator();
                 Properties properties = new Properties();
                 File f = File.createTempFile(DumpAmf0TrackToPropertyFile.class.getSimpleName(), "" + track.getTrackMetaData().getTrackId());
-                for (TimeToSampleBox.Entry entry : track.getDecodingTimeEntries()) {
-                    for (int i = 0; i < entry.getCount(); i++) {
-                        ByteBuffer sample = samples.next().asByteBuffer();
-                        byte[] sampleBytes = new byte[sample.limit()];
-                        sample.reset();
-                        sample.get(sampleBytes);
-                        properties.put("" + time, new String(Base64.encodeBase64(sampleBytes, false, false)));
-                        time += entry.getDelta();
-                    }
+                for (long decodingTime : track.getDecodingTimes()) {
+                    ByteBuffer sample = samples.next().asByteBuffer();
+                    byte[] sampleBytes = new byte[sample.limit()];
+                    sample.reset();
+                    sample.get(sampleBytes);
+                    properties.put("" + time, new String(Base64.encodeBase64(sampleBytes, false, false)));
+                    time += decodingTime;
                 }
                 FileOutputStream fos = new FileOutputStream(f);
                 System.err.println(properties);

@@ -34,7 +34,7 @@ public class FindCommonSync {
                     System.out.println("Found video track in " + arg);
                     long[] syncSamples = t.getSyncSamples();
                     long timescale = t.getTrackMetaData().getTimescale();
-                    long tts = t.getDecodingTimeEntries().get(0).getDelta();
+                    long tts = t.getDecodingTimes()[0];
                     for (long syncSample : syncSamples) {
                         long time = 1000 * tts * (syncSample - 1) / timescale;
                         int inttime = (int) time;

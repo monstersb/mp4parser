@@ -32,9 +32,9 @@ public class ShortenExample {
         movie.setTracks(new LinkedList<Track>());
         // remove all tracks we will create new tracks from the old
 
-        double startTime1 =10;
+        double startTime1 = 10;
         double endTime1 = 20;
-        double startTime2 =30;
+        double startTime2 = 30;
         double endTime2 = 40;
 
         boolean timeCorrected = false;
@@ -68,31 +68,29 @@ public class ShortenExample {
             long startSample2 = -1;
             long endSample2 = -1;
 
-            for (int i = 0; i < track.getDecodingTimeEntries().size(); i++) {
-                TimeToSampleBox.Entry entry = track.getDecodingTimeEntries().get(i);
-                for (int j = 0; j < entry.getCount(); j++) {
+            for (int i = 0; i < track.getDecodingTimes().length; i++) {
+                long delta = track.getDecodingTimes()[i];
 
 
-                    if (currentTime > lastTime && currentTime <= startTime1) {
-                        // current sample is still before the new starttime
-                        startSample1 = currentSample;
-                    }
-                    if (currentTime > lastTime && currentTime <= endTime1) {
-                        // current sample is after the new start time and still before the new endtime
-                        endSample1= currentSample;
-                    }
-                    if (currentTime > lastTime && currentTime <= startTime2) {
-                        // current sample is still before the new starttime
-                        startSample2 = currentSample;
-                    }
-                    if (currentTime > lastTime && currentTime <= endTime2) {
-                        // current sample is after the new start time and still before the new endtime
-                        endSample2 = currentSample;
-                    }
-                    lastTime = currentTime;
-                    currentTime += (double) entry.getDelta() / (double) track.getTrackMetaData().getTimescale();
-                    currentSample++;
+                if (currentTime > lastTime && currentTime <= startTime1) {
+                    // current sample is still before the new starttime
+                    startSample1 = currentSample;
                 }
+                if (currentTime > lastTime && currentTime <= endTime1) {
+                    // current sample is after the new start time and still before the new endtime
+                    endSample1 = currentSample;
+                }
+                if (currentTime > lastTime && currentTime <= startTime2) {
+                    // current sample is still before the new starttime
+                    startSample2 = currentSample;
+                }
+                if (currentTime > lastTime && currentTime <= endTime2) {
+                    // current sample is after the new start time and still before the new endtime
+                    endSample2 = currentSample;
+                }
+                lastTime = currentTime;
+                currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
+                currentSample++;
             }
             movie.addTrack(new AppendTrack(new CroppedTrack(track, startSample1, endSample1), new CroppedTrack(track, startSample2, endSample2)));
         }
@@ -111,28 +109,21 @@ public class ShortenExample {
         System.err.println("Writing IsoFile speed : " + (new File(String.format("output-%f-%f--%f-%f.mp4", startTime1, endTime1, startTime2, endTime2)).length() / (start3 - start2) / 1000) + "MB/s");
     }
 
-    protected static long getDuration(Track track) {
-        long duration = 0;
-        for (TimeToSampleBox.Entry entry : track.getDecodingTimeEntries()) {
-            duration += entry.getCount() * entry.getDelta();
-        }
-        return duration;
-    }
 
     private static double correctTimeToSyncSample(Track track, double cutHere, boolean next) {
         double[] timeOfSyncSamples = new double[track.getSyncSamples().length];
         long currentSample = 0;
         double currentTime = 0;
-        for (int i = 0; i < track.getDecodingTimeEntries().size(); i++) {
-            TimeToSampleBox.Entry entry = track.getDecodingTimeEntries().get(i);
-            for (int j = 0; j < entry.getCount(); j++) {
-                if (Arrays.binarySearch(track.getSyncSamples(), currentSample + 1) >= 0) {
-                    // samples always start with 1 but we start with zero therefore +1
-                    timeOfSyncSamples[Arrays.binarySearch(track.getSyncSamples(), currentSample + 1)] = currentTime;
-                }
-                currentTime += (double) entry.getDelta() / (double) track.getTrackMetaData().getTimescale();
-                currentSample++;
+        for (int i = 0; i < track.getDecodingTimes().length; i++) {
+            long delta = track.getDecodingTimes()[i];
+
+            if (Arrays.binarySearch(track.getSyncSamples(), currentSample + 1) >= 0) {
+                // samples always start with 1 but we start with zero therefore +1
+                timeOfSyncSamples[Arrays.binarySearch(track.getSyncSamples(), currentSample + 1)] = currentTime;
             }
+            currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
+            currentSample++;
+
         }
         double previous = 0;
         for (double timeOfSyncSample : timeOfSyncSamples) {

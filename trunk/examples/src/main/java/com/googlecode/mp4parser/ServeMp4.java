@@ -55,7 +55,7 @@ public class ServeMp4 extends AbstractHandler {
         // remove all tracks we will create new tracks from the old
 
         double startTime = Double.parseDouble(start);
-        double endTime = (double) getDuration(tracks.get(0)) / tracks.get(0).getTrackMetaData().getTimescale();
+        double endTime = (double) tracks.get(0).getDuration() / tracks.get(0).getTrackMetaData().getTimescale();
 
         boolean timeCorrected = false;
 
@@ -83,25 +83,22 @@ public class ServeMp4 extends AbstractHandler {
             long startSample = -1;
             long endSample = -1;
 
-            for (int i = 0; i < track.getDecodingTimeEntries().size(); i++) {
-                TimeToSampleBox.Entry entry = track.getDecodingTimeEntries().get(i);
-                for (int j = 0; j < entry.getCount(); j++) {
-                    // entry.getDelta() is the amount of time the current sample covers.
+            for (int i = 0; i < track.getDecodingTimes().length; i++) {
+                long delta = track.getDecodingTimes()[i];
 
-                    if (currentTime <= startTime) {
-                        // current sample is still before the new starttime
-                        startSample = currentSample;
-                    }
-                    if (currentTime <= endTime) {
-                        // current sample is after the new start time and still before the new endtime
-                        endSample = currentSample;
-                    } else {
-                        // current sample is after the end of the cropped video
-                        break;
-                    }
-                    currentTime += (double) entry.getDelta() / (double) track.getTrackMetaData().getTimescale();
-                    currentSample++;
+                if (currentTime <= startTime) {
+                    // current sample is still before the new starttime
+                    startSample = currentSample;
                 }
+                if (currentTime <= endTime) {
+                    // current sample is after the new start time and still before the new endtime
+                    endSample = currentSample;
+                } else {
+                    // current sample is after the end of the cropped video
+                    break;
+                }
+                currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
+                currentSample++;
             }
             movie.addTrack(new CroppedTrack(track, startSample, endSample));
         }
@@ -115,29 +112,18 @@ public class ServeMp4 extends AbstractHandler {
 
     }
 
-
-    protected static long getDuration(Track track) {
-        long duration = 0;
-        for (TimeToSampleBox.Entry entry : track.getDecodingTimeEntries()) {
-            duration += entry.getCount() * entry.getDelta();
-        }
-        return duration;
-    }
-
     private static double correctTimeToSyncSample(Track track, double cutHere, boolean next) {
         double[] timeOfSyncSamples = new double[track.getSyncSamples().length];
         long currentSample = 0;
         double currentTime = 0;
-        for (int i = 0; i < track.getDecodingTimeEntries().size(); i++) {
-            TimeToSampleBox.Entry entry = track.getDecodingTimeEntries().get(i);
-            for (int j = 0; j < entry.getCount(); j++) {
-                if (Arrays.binarySearch(track.getSyncSamples(), currentSample + 1) >= 0) {
-                    // samples always start with 1 but we start with zero therefore +1
-                    timeOfSyncSamples[Arrays.binarySearch(track.getSyncSamples(), currentSample + 1)] = currentTime;
-                }
-                currentTime += (double) entry.getDelta() / (double) track.getTrackMetaData().getTimescale();
-                currentSample++;
+        for (int i = 0; i < track.getDecodingTimes().length; i++) {
+            long delta = track.getDecodingTimes()[i];
+            if (Arrays.binarySearch(track.getSyncSamples(), currentSample + 1) >= 0) {
+                // samples always start with 1 but we start with zero therefore +1
+                timeOfSyncSamples[Arrays.binarySearch(track.getSyncSamples(), currentSample + 1)] = currentTime;
             }
+            currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
+            currentSample++;
         }
         double previous = 0;
         for (double timeOfSyncSample : timeOfSyncSamples) {

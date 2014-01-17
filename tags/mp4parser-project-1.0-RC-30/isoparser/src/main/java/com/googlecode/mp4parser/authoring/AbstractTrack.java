@@ -1,0 +1,98 @@
+/*
+ * Copyright 2012 Sebastian Annies, Hamburg
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.googlecode.mp4parser.authoring;
+
+import com.coremedia.iso.boxes.*;
+
+import java.util.List;
+
+/**
+ *
+ */
+public abstract class AbstractTrack implements Track {
+    private boolean enabled = true;
+    private boolean inMovie = true;
+    private boolean inPreview = true;
+    private boolean inPoster = true;
+    private long[] decodingTimes = null;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public boolean isInMovie() {
+        return inMovie;
+    }
+
+    public boolean isInPreview() {
+        return inPreview;
+    }
+
+    public boolean isInPoster() {
+        return inPoster;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void setInMovie(boolean inMovie) {
+        this.inMovie = inMovie;
+    }
+
+    public void setInPreview(boolean inPreview) {
+        this.inPreview = inPreview;
+    }
+
+    public void setInPoster(boolean inPoster) {
+        this.inPoster = inPoster;
+    }
+
+    public abstract List<TimeToSampleBox.Entry> getDecodingTimeEntries();
+
+    public synchronized long[] getDecodingTimes() {
+        if (decodingTimes == null) {
+            decodingTimes = TimeToSampleBox.blowupTimeToSamples(this.getDecodingTimeEntries());
+        }
+        return decodingTimes;
+    }
+
+    public List<CompositionTimeToSample.Entry> getCompositionTimeEntries() {
+        return null;
+    }
+
+    public long[] getSyncSamples() {
+        return null;
+    }
+
+    public List<SampleDependencyTypeBox.Entry> getSampleDependencies() {
+        return null;
+    }
+
+    public SubSampleInformationBox getSubsampleInformationBox() {
+        return null;
+    }
+
+    public long getDuration() {
+        long duration = 0;
+        for (long delta : getDecodingTimes()) {
+            duration += delta;
+        }
+        return duration;
+    }
+
+}

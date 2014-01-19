@@ -1,7 +1,6 @@
 package com.googlecode.mp4parser;
 
 import com.coremedia.iso.boxes.Container;
-import com.coremedia.iso.boxes.TimeToSampleBox;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -14,8 +13,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
@@ -83,8 +80,8 @@ public class ServeMp4 extends AbstractHandler {
             long startSample = -1;
             long endSample = -1;
 
-            for (int i = 0; i < track.getDecodingTimes().length; i++) {
-                long delta = track.getDecodingTimes()[i];
+            for (int i = 0; i < track.getSampleDurations().length; i++) {
+                long delta = track.getSampleDurations()[i];
 
                 if (currentTime <= startTime) {
                     // current sample is still before the new starttime
@@ -116,8 +113,8 @@ public class ServeMp4 extends AbstractHandler {
         double[] timeOfSyncSamples = new double[track.getSyncSamples().length];
         long currentSample = 0;
         double currentTime = 0;
-        for (int i = 0; i < track.getDecodingTimes().length; i++) {
-            long delta = track.getDecodingTimes()[i];
+        for (int i = 0; i < track.getSampleDurations().length; i++) {
+            long delta = track.getSampleDurations()[i];
             if (Arrays.binarySearch(track.getSyncSamples(), currentSample + 1) >= 0) {
                 // samples always start with 1 but we start with zero therefore +1
                 timeOfSyncSamples[Arrays.binarySearch(track.getSyncSamples(), currentSample + 1)] = currentTime;

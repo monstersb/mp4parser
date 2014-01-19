@@ -1,7 +1,6 @@
 package com.googlecode.mp4parser.stuff;
 
 import com.coremedia.iso.boxes.NullMediaHeaderBox;
-import com.coremedia.iso.boxes.TimeToSampleBox;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Sample;
 import com.googlecode.mp4parser.authoring.Track;
@@ -27,7 +26,7 @@ public class DumpAmf0TrackToPropertyFile {
                 Iterator<Sample> samples = track.getSamples().iterator();
                 Properties properties = new Properties();
                 File f = File.createTempFile(DumpAmf0TrackToPropertyFile.class.getSimpleName(), "" + track.getTrackMetaData().getTrackId());
-                for (long decodingTime : track.getDecodingTimes()) {
+                for (long decodingTime : track.getSampleDurations()) {
                     ByteBuffer sample = samples.next().asByteBuffer();
                     byte[] sampleBytes = new byte[sample.limit()];
                     sample.reset();

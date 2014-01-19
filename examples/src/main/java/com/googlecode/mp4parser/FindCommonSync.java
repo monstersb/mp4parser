@@ -4,7 +4,6 @@ import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -34,7 +33,7 @@ public class FindCommonSync {
                     System.out.println("Found video track in " + arg);
                     long[] syncSamples = t.getSyncSamples();
                     long timescale = t.getTrackMetaData().getTimescale();
-                    long tts = t.getDecodingTimes()[0];
+                    long tts = t.getSampleDurations()[0];
                     for (long syncSample : syncSamples) {
                         long time = 1000 * tts * (syncSample - 1) / timescale;
                         int inttime = (int) time;

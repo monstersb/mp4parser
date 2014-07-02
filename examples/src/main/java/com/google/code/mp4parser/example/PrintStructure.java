@@ -34,8 +34,8 @@ public class PrintStructure {
         while (fc.size() - fc.position() > 8) {
             long start = fc.position();
             ByteBuffer bb = ByteBuffer.allocate(8);
-            bb.reset();
             fc.read(bb);
+            bb.rewind();
             long size = IsoTypeReader.readUInt32(bb);
             String type = IsoTypeReader.read4cc(bb);
             long end = start + size;

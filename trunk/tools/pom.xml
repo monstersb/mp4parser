@@ -12,7 +12,6 @@
     <modules>
         <module>smooth-streaming-fragmenter</module>
         <module>smooth-streaming-downloader</module>
-        <module>mp4-inspector</module>
     </modules>
 
 

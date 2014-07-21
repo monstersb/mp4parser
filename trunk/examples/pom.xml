@@ -5,11 +5,11 @@
 
     <artifactId>examples</artifactId>
     <name>IsoParser Examples</name>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.3.2-SNAPSHOT</version>
     <parent>
         <groupId>com.googlecode.mp4parser</groupId>
         <artifactId>mp4parser-project</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.3.2-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
